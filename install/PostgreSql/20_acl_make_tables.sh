@@ -263,7 +263,7 @@ INSERT INTO webacula_job_acl     (name, order_acl, role_id)  VALUES ('*all*', 1,
 
 -- PHP session storage
 CREATE TABLE webacula_php_session (
-    id       char(32),
+    id       char(128),
     modified integer,
     lifetime integer,
     data_session TEXT,

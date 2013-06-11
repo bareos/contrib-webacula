@@ -101,7 +101,7 @@ class Media extends Zend_Db_Table
             'Recycle', 'Slot', 'InChanger', 'MediaType',
             'FirstWritten', 'LastWritten',
             'LabelDate', 'VolFiles', 'VolBlocks', 'VolMounts',
-            'VolParts', 'VolErrors', 'VolWrites', 'VolCapacityBytes', 'Enabled',
+            'VolErrors', 'VolWrites', 'VolCapacityBytes', 'Enabled',
             'ActionOnPurge', 'VolUseDuration', 'MaxVolJobs', 'MaxVolFiles',
             'VolReadTime', 'VolWriteTime', 'EndFile', 'EndBlock',
             'RecycleCount', 'InitialWrite','Comment'

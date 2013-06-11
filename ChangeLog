@@ -1,6 +1,11 @@
 Webacula ChangeLog
 ------------------
 
+=== 5.5.3 (Tue Jun 11 2013)
+    Changed Parameters to work with bareos
+    Fixed catalog version problem
+    Fixed depricated values in table webacula_php_session for id (increase to 128)
+
 === 5.5.2 (Sun Oct 30 2011)
     Show human readable short Job description instead (or both) of Bacula Job names (see config.ini for details).
     Show Bacula Job resource record (bconsole> show job="xxx").
