@@ -1,6 +1,12 @@
 Webacula ChangeLog
 ------------------
 
+=== 5.5.4 (We Oct 16 2013)
+    Changed Default DB-Params to PGSQL
+    Changed SQLite settings to bareos
+    Added the new bconsole commands to the web bconsole
+
+
 === 5.5.3 (Tue Jun 11 2013)
     Changed Parameters to work with bareos
     Fixed catalog version problem
