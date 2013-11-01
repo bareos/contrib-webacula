@@ -1,14 +1,18 @@
+Webacula - web interface of a Bareos/Bacula backup system
 
-Webacula - Web Bacula -	web interface of a Bacula backup system http://www.bacula.org/
-
-Version: 5.5.2
+Version: 5.5.x
 
 http://webacula.sourceforge.net/
 http://github.com/tim4dev/webacula
 
+https://github.com/bareos/contrib-webacula/ is a fork of the Webacula project,
+to adapt this software to be usable with Bareos (a Bacula fork).
+The default branch inside this fork is 
+  * bareos-master
+Other "bareos-*" branches may follow.
 
 Webacula basic features:
-  * Bacula and Webacula ACLs (Access Control Lists) implemented. ACLs stored in Bacula database in Webacula tables
+  * Bareos/Bacula and Webacula ACLs (Access Control Lists) implemented. ACLs stored in Bareos/Bacula database in Webacula tables
   * Full supported MySQL, PostgreSQL and Sqlite databases
   * Run Job
   * Restore all files or selected files from Job by JobId
@@ -22,7 +26,7 @@ Webacula basic features:
   * Show all running Jobs
   * Show terminated Jobs (executed in last 24 hours)
   * Search Jobs on several conditions
-  * Web (ajax) terminal to Bacula Console
+  * Web (ajax) terminal to Bareos/Bacula Console
   * The detailed information on Pools, Volumes, Storages and Clients
   * Logbook. Logbook - is simple electronic journal of backups. 
     Records in logbook are insert, modify, delete manually by the operator. 
@@ -33,7 +37,6 @@ Webacula basic features:
   * RSS feed
   * Multilingual support - standard gettext (*.mo) files. Currently supported languages: English, Czech, French, German, Italian, Portuguese Brazil, Russian, Spanish.
   * For web designers : now very easy to create new skins
-  * Major version number of Webacula will match the version number of Bacula
 
 
 
