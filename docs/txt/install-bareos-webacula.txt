@@ -1,0 +1,5 @@
+sudoers.d/
+
+RHEL:
+- selinux: off or permissive (or configure httpd)
+- php5-ZendFramework (php-ZendFramework from EPEL had dependency problems 20131012)

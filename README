@@ -1,12 +1,13 @@
 Webacula - web interface of a Bareos/Bacula backup system
 
-Version: 5.5.x
+Version: 5.5.2.x
 
 http://webacula.sourceforge.net/
 http://github.com/tim4dev/webacula
 
 https://github.com/bareos/contrib-webacula/ is a fork of the Webacula project,
 to adapt this software to be usable with Bareos (a Bacula fork).
+It is based on Webacula version 5.5.2. The version for the Bareos are appended to this version (5.5.2.x).
 The default branch inside this fork is 
   * bareos-master
 Other "bareos-*" branches may follow.

@@ -1,13 +1,26 @@
 Webacula ChangeLog
 ------------------
 
-=== 5.5.4 (We Oct 16 2013)
+=== 5.5.2.5 (We Nov 14 2013)
+    added webacula-config to automatically configure webacula and the database
+        add a own database user "webacula" for accessing the bacula/bareos database
+        removed db.conf, because data is taken from config.ini
+        no default DB
+    don't preset the timezone. Take system default.
+    added sudo configuration
+    prepare handling of databases on differnet hosts
+    set default http configuration to APPLICATION_ENV development. 
+      Otherwise configuration errors are to hard to find.
+    Allow access from everywhere, not only localhost.
+    Add SPEC file for obs (openSUSE, SLES, RHEL, CentOS)
+
+=== 5.5.2.4 (We Oct 16 2013)
     Changed Default DB-Params to PGSQL
     Changed SQLite settings to bareos
     Added the new bconsole commands to the web bconsole
 
 
-=== 5.5.3 (Tue Jun 11 2013)
+=== 5.5.2.3 (Tue Jun 11 2013)
     Changed Parameters to work with bareos
     Fixed catalog version problem
     Fixed depricated values in table webacula_php_session for id (increase to 128)

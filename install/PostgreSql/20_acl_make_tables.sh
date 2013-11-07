@@ -3,11 +3,11 @@
 # Script to create webacula tables
 #
 
-.   ../db.conf
+webacula_root_pwd=${webacula_root_pwd:-"CHANGEME"}
+CMD=${CMD:-`/usr/sbin/webacula-config get_sql_cmd`}
 
-
-psql -q -f - -d $db_name $*  <<END-OF-DATA
-
+printf "CMD: $CMD\n"
+eval $CMD <<END-OF-DATA
 
 SET client_min_messages=WARNING;
 
@@ -274,14 +274,10 @@ CREATE TABLE webacula_php_session (
 
 END-OF-DATA
 
-
 res=$?
-if test $res = 0;
-then
+if test $res = 0; then
    echo "PostgreSql : create of Webacula ACL tables succeeded."
 else
    echo "PostgreSql : create of Webacula ACL tables failed!"
-   exit 1
 fi
-
-exit 0
+exit $res
