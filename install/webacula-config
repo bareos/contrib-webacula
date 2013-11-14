@@ -1,0 +1,248 @@
+#!/bin/bash
+
+# script that does all needed steps to run webacula
+# use at own risk
+
+set -o errexit -o nounset
+
+WEBACULA_CONFIG=/etc/webacula/config.ini
+WEBACULA_INTERACTIVE=${WEBACULA_INTERACTIVE:-""}
+
+# bareos-config reacts to parameter.
+# To source it, parameter first have to be removed.
+# After sourcing, we set the parameter again.
+BAREOS_CONFIG="/usr/lib/bareos/scripts/bareos-config"
+if ! [ -x "$BAREOS_CONFIG" ]; then
+    echo "FAILED: $BAREOS_CONFIG not found"
+    exit 1
+fi
+ARGS="$@"
+shift $#
+source /usr/lib/bareos/scripts/bareos-config
+set $ARGS
+
+get_config()
+{
+    local PARAM=$1
+    shift
+    eval echo `sed -r -n "s/^${PARAM}[ ]*=[ ]*//p" $WEBACULA_CONFIG`
+}
+
+set_config()
+{
+    # set settings in the webacula config file.
+    # Limitation: only sets values, if PARAM exists but have no value.
+    #   This should prevent problems if the user already adapts the settings.
+    # TODO: section is currently ignored
+    local SECTION=$1
+    local PARAM=$2
+    local VALUE=$3
+    local error=0
+    if grep -q "^${PARAM}" $WEBACULA_CONFIG; then
+        echo "$WEBACULA_CONFIG: set [$SECTION] ${PARAM} = ${VALUE}"
+        sed -r -i "s#^${PARAM}[ ]*=[ ]*#${PARAM} = ${VALUE}#" $WEBACULA_CONFIG
+    else
+        echo "FAILED to set [$SECTION] ${PARAM} = ${VALUE} ($WEBACULA_CONFIG)"
+        error=1
+    fi
+    return $error
+}
+
+get_db_param()
+{
+    export db_adapter=`get_config "db.adapter"`
+    export db_host=`get_config "db.config.host"`
+    export db_name=`get_config "db.config.dbname"`
+    export db_user=`get_config "db.config.username"`
+    export db_password=`get_config "db.config.password"`
+}
+
+get_db_user()
+{
+    get_config "db.config.username"
+}
+
+get_db_password()
+{
+    get_config "db.config.password"
+}
+
+
+get_sql_cmd()
+{
+    get_db_param
+    local CMD=""
+
+    case "`get_database_driver`" in
+        postgreql)
+            cmd_postgres=`get_config "cmd_postgres"`
+            if [ "${db_host}" -a "${db_host}" != "localhost" ]; then
+                if [ "$WEBACULA_INTERACTIVE" = "no" ]; then
+                    echo "failed: no database command for non-interactive mode available"
+                    CMD="false"
+                else
+                    CMD=`get_config "cmd_remote_postgres"`
+                fi
+            else
+                CMD=`get_config "cmd_local_postgres"`
+            fi
+            ;;
+        mysql)
+            cmd_mysql=`get_config "cmd_mysql"`
+            if [ "${db_host}" -a "${db_host}" != "localhost" ]; then
+                if [ "$WEBACULA_INTERACTIVE" = "no" ]; then
+                    echo "failed: no database command for non-interactive mode available"
+                    CMD="false"
+                else
+                    CMD=`get_config "cmd_remote_mysql"`
+                fi
+            else
+                CMD=`get_config "cmd_local_mysql"`
+            fi
+            ;;
+    esac
+
+    echo "$CMD"
+}
+
+configure_postgres()
+{
+    local error=0
+
+    get_db_param
+
+    # TODO: check if user and password are set
+
+    if [ -x /usr/lib/bareos/scripts/grant_bareos_privileges ]; then
+        su postgres -c /usr/lib/bareos/scripts/grant_bareos_privileges
+    else
+        echo "FAILED to create webacula database user"
+        error=1
+    fi
+
+    # create databases and permissions
+    for i in /usr/share/webacula/install/PostgreSql/*.sh; do
+        echo "$i"
+        $i || ((error+=1))
+    done
+
+    PG_HBA_CONF=`su - postgres -c "psql --no-align --tuples-only -c 'SHOW hba_file;'"`
+
+    PG_HBA_WEBACULA="\n# webacula access rules\nhost    $db_name    $db_user    127.0.0.1/32    md5\nhost    $db_name    $db_user    ::1/128         md5\n"
+
+    if grep -q "$db_user" ${PG_HBA_CONF}; then
+        echo "SKIPPED: ${PG_HBA_CONF}: user $db_user is already configured"
+    else
+        if [ -w ${PG_HBA_CONF} ]; then
+            sed -r -i "s@^(#\s*TYPE\s*DATABASE\s*USER\s*CIDR-ADDRESS\s*METHOD)@\1\n${PG_HBA_WEBACULA}@" ${PG_HBA_CONF}
+            su - postgres -c "pg_ctl reload"
+        fi
+    fi
+
+    return $error
+}
+
+test_postgres()
+{
+    get_db_param
+    PGHOST="$db_host" PGDATABASE="$db_name" PGUSER="$db_user"  PGPASSWORD="$db_password" psql
+}
+
+
+configure_mysql()
+{
+    local error=0
+
+    get_db_param
+
+    # TODO: check if user and password are set
+
+    if [ -x /usr/lib/bareos/scripts/grant_bareos_privileges ]; then
+        /usr/lib/bareos/scripts/grant_bareos_privileges
+    else
+        echo "FAILED to create webacula database user"
+        error=1
+    fi
+
+    # create databases and permissions
+    for i in /usr/share/webacula/install/MySql/*.sh; do
+        echo "$i"
+        $i || ((error+=1))
+    done
+
+    return $error
+}
+
+test_mysql()
+{
+    get_db_param
+    MYSQL_HOST="$db_host" USER="$db_user"  MYSQL_PWD="$db_password" mysql "$db_name"
+}
+
+
+init()
+{
+    local error=0
+
+    # if bareos database is running locally,
+    # get the database type.
+    # Create a new webacula database user (random password),
+    # grant database permissions,
+    # adapt webacula config file accordingly
+
+    # TODO: check if bareos is running and what database it uses
+    BAREOS_DATABASE=`get_database_driver`
+
+    # if webacula is not already configured
+    #   (get_config "db.config.password" already set)
+
+    # config file variables to environment variables
+    get_db_param
+
+    # check if a db password is defined, otherwise generate a new one
+    if [ -z "$db_password" ]; then
+        db_password=`openssl rand -base64 33`
+        set_config "general" "db.config.password" "$db_password"
+    fi
+
+    case "$BAREOS_DATABASE" in
+        postgresql)
+            if [ "$db_adapter" != "PDO_PGSQL" ]; then
+                set_config "general" "db.adapter" "PDO_PGSQL" || ((error+=1))
+            fi
+            configure_postgres || ((error+=1))
+            ;;
+        mysql)
+            if [ "$db_adapter" != "PDO_MYSQL" ]; then
+                set_config "general" "db.adapter" "PDO_MYSQL" || ((error+=1))
+            fi
+            configure_mysql || ((error+=1))
+            ;;
+        sqlite)
+            echo "TODO"
+            ((error+=1))
+            ;;
+        *)
+            echo "FAILED: unknown database backend $BAREOS_DATABASE"
+            ((error+=1))
+    esac
+    return $error
+}
+
+# number of args passed
+args=$#
+
+# without parameter, nothing is done.
+# this allows this script to be sourced
+# to use its functions
+if [ $args -ge 1 ]; then
+    # executes given arguments
+    if is_function $1; then
+        $*
+        exit $?
+    else
+        echo "failed to execute $*. Not found."
+        #usage
+        exit 127
+    fi
+fi

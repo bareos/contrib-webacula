@@ -3,13 +3,11 @@
 # Script to create webacula tables
 #
 
-.   ../db.conf
+db_user=${db_user:-`/usr/sbin/webacula-config get_db_user`}
+CMD="${CMD:-`/usr/sbin/webacula-config get_sql_cmd`}"
 
-
-
-psql -q -f - -d $db_name $* <<END-OF-DATA
-
-
+printf "CMD: $CMD\n"
+eval $CMD <<END-OF-DATA
 
 SET client_min_messages=WARNING;
 
@@ -94,9 +92,9 @@ GRANT EXECUTE ON FUNCTION webacula_clone_file(vTbl TEXT, vFileId INT, vPathId IN
 END-OF-DATA
 
 res=$?
-if test $res = 0;
-then
+if test $res = 0; then
    echo "PostgreSql : create of Webacula tables succeeded."
 else
    echo "PostgreSql : create of Webacula tables failed!"
 fi
+exit $res

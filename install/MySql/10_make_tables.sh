@@ -3,17 +3,16 @@
 # Script to create webacula tables
 #
 
-.   ../db.conf
+db_user=${db_user:-`/usr/sbin/webacula-config get_db_user`}
+db_password=${db_password:-`/usr/sbin/webacula-config get_db_password`}
 
-if [ -n "$db_pwd" ]
-then
-    pwd="-p$db_pwd"
-else
-    pwd=""
-fi
+CMD="${CMD:-`/usr/sbin/webacula-config get_sql_cmd`}"
 
+eval $CMD <<END-OF-DATA
 
-if mysql $* -u $db_user $pwd  $db_name -f <<END-OF-DATA
+-- set password
+UPDATE mysql.user SET Password=PASSWORD('$db_password') WHERE User='$db_user';
+flush privileges;
 
 CREATE TABLE IF NOT EXISTS webacula_logbook (
 	logId		INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -67,11 +66,12 @@ CREATE TABLE webacula_version (
 
 INSERT INTO webacula_version (versionId) VALUES (5);
 
-
 END-OF-DATA
-then
+
+res=$?
+if test $res = 0; then
    echo "Creation of webacula MySQL tables succeeded."
 else
    echo "Creation of webacula MySQL tables failed."
 fi
-exit 0
+exit $res

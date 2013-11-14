@@ -1,18 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 #
 # shell script TO grant privileges to the bareos database
 #
-db_user=bareos #${db_user:-bareos}
-bindir=/usr/bin
-db_name=bareos #${db_name:-bareos}
-db_password=
-if [ "$db_password" != "" ]; then
-   pass="password '$db_password'"
-fi
 
+set -o errexit -o nounset
 
-$bindir/psql -f - -d ${db_name} $* <<END-OF-DATA
+db_user=${db_user:-`/usr/sbin/webacula-config get_db_user`}
+db_password=${db_password:-`/usr/sbin/webacula-config get_db_password`}
+CMD=${CMD:-`/usr/sbin/webacula-config get_sql_cmd`}
 
+printf "CMD: $CMD\n"
+eval $CMD <<END-OF-DATA
+
+-- set password
+ALTER USER ${db_user} PASSWORD '${db_password}';
 
 -- For tables
 GRANT ALL ON webacula_logbook TO ${db_user};
@@ -50,11 +51,11 @@ GRANT SELECT, UPDATE ON webacula_storage_acl_id_seq TO ${db_user};
 GRANT SELECT, UPDATE ON webacula_users_id_seq TO ${db_user};
 GRANT SELECT, UPDATE ON webacula_where_acl_id_seq TO ${db_user};
 END-OF-DATA
-if [ $? -eq 0 ]
-then
-   echo "Privileges for user ${db_user} granted ON database ${db_name}."
-   exit 0
+
+res=$?
+if test $res = 0; then
+   echo "Privileges for user ${db_user} granted."
 else
    echo "Error creating privileges."
-   exit 1
 fi
+exit $res

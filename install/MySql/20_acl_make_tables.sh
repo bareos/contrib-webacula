@@ -3,18 +3,10 @@
 # Script to create Webacula ACLs tables in Bacula database
 #
 
-.   ../db.conf
+webacula_root_pwd=${webacula_root_pwd:-"CHANGEME"}
+CMD="${CMD:-`/usr/sbin/webacula-config get_sql_cmd`}"
 
-
-if [ -n "$db_pwd" ]
-then
-    pwd="-p$db_pwd"
-else
-    pwd=""
-fi
-
-
-if mysql $* -u $db_user $pwd  $db_name -f <<END-OF-DATA
+eval $CMD <<END-OF-DATA
 
 CREATE TABLE IF NOT EXISTS webacula_users (
     id       integer not null auto_increment,
@@ -275,9 +267,11 @@ CREATE TABLE webacula_php_session (
 
 
 END-OF-DATA
-then
+
+res=$?
+if test $res = 0; then
    echo "Creation of Webacula ACLs MySQL tables succeeded."
 else
    echo "Creation of Webacula ACLs MySQL tables failed."
 fi
-exit 0
+exit $res
