@@ -1,6 +1,7 @@
 
 Name:          webacula
 Provides:      bareos-webacula
+Provides:      bareos-console-web
 Version:       5.5.2
 Release:       0%{?dist}
 Summary:       Web interface of a Bareos/Bacula backup system
