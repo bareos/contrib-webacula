@@ -183,7 +183,7 @@ try {
 } catch (Zend_Db_Adapter_Exception $e) {
     echo '<pre>';
     // возможно СУБД не запущена
-    throw new Zend_Exception("Fatal error: Can't connect to SQL server.");
+    throw new Zend_Exception("Fatal error: Can't connect to SQL server");
 }
 /*
  * Check Bacula Catalog version
