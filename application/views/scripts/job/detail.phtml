@@ -13,34 +13,42 @@
 <tr>
 	<td> <?php print $this->translate->_("Job Id"); ?> </td>
     <td style="padding: 0px;">
+	<table>
+            <tr><td>
         &nbsp;<?php echo $this->escape($line['jobid']);?>&nbsp;&nbsp;
         <a href="<?php echo $this->baseUrl .'/log/view-log-id/jobid/'. $this->jobid . '/jobname/' . $this->resultJob[0]['name']; ?>" title="<?php
             echo $this->translate->_("Console Messages"); ?>">
             <?php print $this->translate->_("Console Messages"); ?></a>&nbsp;&nbsp;
+            </td>
         <?php
             if ( isset($line['poolid'], $line['poolname']) )    {
+		echo "<td>";
                 // restore button
                 echo '<a href="';
                 echo $this->baseUrl, '/restorejob/main-form/jobid/', $this->escape($line['jobid']);
                 echo '" title="', $this->translate->_("Restore Job"), '">';
-                echo '<img src="', $this->baseUrl, '/images/restore.png" alt="', $this->translate->_("Restore Job"), '"',
-                    ' border="0" hspace="1" align="absmiddle">';
+                //echo '<img src="', $this->baseUrl, '/images/restore.png" alt="', $this->translate->_("Restore Job"), '"', ' border="0" hspace="1" align="absmiddle">';
+                echo '<span class="ui-icon ui-icon-arrowreturnthick-1-w"></span>';
                 echo '</a>';
+                echo "</td>";
             }
         ?>
         <?php
             if ( isset($line['name']) )    {
+		echo "<td>";
                 // re-run button
                 echo '<a href="';
                 echo $this->baseUrl, '/job/run-job/jobname/', $this->escape($line['name']);
                 echo '" title="', $this->translate->_("Re-run Job"), '">';
-                echo '<img src="', $this->baseUrl, '/images/re-run-job.png" alt="', $this->translate->_("Re-run Job"), '"',
-                    ' border="0" hspace="1" align="absmiddle">';
+                //echo '<img src="', $this->baseUrl, '/images/re-run-job.png" alt="', $this->translate->_("Re-run Job"), '"', ' border="0" hspace="1" align="absmiddle">';
+                echo '<span class="ui-icon ui-icon-gear"></span>';
                 echo '</a>';
+                echo "</td>";
             }
         ?>
         <?php
             if ( isset($line['poolid'], $line['poolname']) )    {
+		echo "<td>";
                 // add to logbook button
                 echo '<a href="';
                 echo $this->baseUrl, '/wblogbook/writelogbook/name_job/', $this->escape($this->resultJob[0]['name']),
@@ -48,12 +56,14 @@
                     '/jobid/', $this->escape($line['jobid']),
                     '/joberrors/', $this->escape($line['joberrors']);
                 echo '" title="', $this->translate->_("Written in Logbook"), '">';
-                echo '<img src="', $this->baseUrl, '/images/bookmark-new.png" alt="', $this->translate->_("Written in Logbook"),
-                    '" border="0" hspace="1" align="absmiddle">';
+                //echo '<img src="', $this->baseUrl, '/images/bookmark-new.png" alt="', $this->translate->_("Written in Logbook"),'" border="0" hspace="1" align="absmiddle">';
+                echo '<span class="ui-icon ui-icon-document"></span>';
                 echo '</a>';
+                echo "</td>";
             }
         ?>
-
+	</tr>
+	</table>
     </td>
 
 <?php if ($line['priorjobid']) : ?>

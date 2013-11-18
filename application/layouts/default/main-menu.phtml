@@ -96,14 +96,24 @@ if ( !$cache->start($this->identity->role_id . '_main_menu') ) :
     <li><a href="<?php echo $this->baseUrl;?>/help/"><?php print $this->translate->_("Help"); ?></a>
     </li>
     <?php endif; ?>
-
-    <li><a href="<?php echo $this->url( array('controller'=>'auth', 'action'=>'logout'), 'default', true) ?>">
+    
+    <li><a><?php print $this->translate->_("User"); print ": "; print $this->identity->login; ?></a>
+    <ul>
+	<li><a href="<?php echo $this->url( array('controller'=>'auth', 'action'=>'logout'), 'default', true) ?>">
         <?php print $this->translate->_("Logout"); ?></a>
+	</li>
+    </ul>
     </li>
+    
 </ul>
 <?php else : ?>
-    <a href="<?php echo $this->url( array('controller'=>'auth', 'action'=>'logout'), 'default', true) ?>">
+    <li><a><?php print $this->translate->_("User"); print ": "; print $this->identity->login; ?></a>
+    <ul>
+	<li><a href="<?php echo $this->url( array('controller'=>'auth', 'action'=>'logout'), 'default', true) ?>">
         <?php print $this->translate->_("Logout"); ?></a>
+	</li>
+    </ul>
+    </li>
 <?php endif; ?>
 
 <div style="clear: both;"><!--  --></div>

@@ -30,7 +30,7 @@
     <th scope="col"> <?php echo $this->translate->_('Created'); ?> </th>
     <th scope="col"> <?php echo $this->translate->_('Last login'); ?> </th>
     <th scope="col"> <?php echo $this->translate->_('Last IP'); ?> </th>   
-    <th scope="col">&nbsp;</th>
+    <th scope="col" colspan="2">&nbsp;</th>
 </tr>
 </thead>
 <tbody>
@@ -65,14 +65,17 @@
         </td>        
         <td>
         <?php if ($line['id'] != 1000) : ?>
-            <a href="<?php echo $this->baseUrl;?>/admin/user-update/user_id/<?php echo $line['id'] ?>">
-                <img src="<?php echo $this->baseUrl ?>/images/document-edit.png" alt="<?php echo $this->translate->_("Modify record") ?>" title="<?php echo $this->translate->_("Modify record") ?>" border="0" hspace="2" align="absmiddle" />
-            </a>           
-            <a href="<?php echo $this->baseUrl;?>/admin/user-delete/user_id/<?php echo $line['id'] ?>" id="confirm" class="confirm" title="<?php echo $this->translate->_("Delete record") ?>">
-                <img src="<?php echo $this->baseUrl ?>/images/edit-delete.png" alt="<?php echo $this->translate->_("Delete record") ?>" title="<?php echo $this->translate->_("Delete record") ?>" border="0" hspace="2" align="absmiddle" />
+            <a href="<?php echo $this->baseUrl;?>/admin/user-update/user_id/<?php echo $line['id'] ?>" title="<?php echo $this->translate->_("Modify record") ?>" border="0">
+                <span class="ui-icon ui-icon-pencil"></span>
             </a>
-        <?php endif; ?>
+        </td><td>
+            <a href="<?php echo $this->baseUrl;?>/admin/user-delete/user_id/<?php echo $line['id'] ?>" id="confirm" class="confirm" title="<?php echo $this->translate->_("Delete record") ?>" border="0">
+                <span class="ui-icon ui-icon-closethick"></span>
+            </a>
         </td>
+        <?php else : ?>
+        <td colspan="2"></td>
+        <?php endif; ?>   
     </tr>
 <?php endforeach; ?>
 </tbody>

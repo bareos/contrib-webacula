@@ -48,7 +48,8 @@
                 echo '<a href="';
                 echo $this->baseUrl, '/restorejob/main-form/jobid/', $this->escape($line['jobid']);
                 echo '" title="', $this->translate->_("Restore Job"), '">';
-                echo '<img src="', $this->baseUrl, '/images/restore-small.png" alt="', $this->translate->_("Restore Job"), '" border="0" hspace="2">';
+                //echo '<img src="', $this->baseUrl, '/images/restore-small.png" alt="', $this->translate->_("Restore Job"), '" border="0" hspace="2">';
+                echo '<span class="ui-icon ui-icon-arrowreturnthick-1-w"></span>';
                 echo '</a>';
             }
         ?>
@@ -60,7 +61,8 @@
                 echo '<a href="';
                 echo $this->baseUrl, '/job/run-job/jobname/', $this->escape($line['jobname']);
                 echo '" title="', $this->translate->_("Re-run Job"), '">';
-                echo '<img src="', $this->baseUrl, '/images/re-run-job-small.png" alt="', $this->translate->_("Re-run Job"), '" border="0" hspace="2">';
+                //echo '<img src="', $this->baseUrl, '/images/re-run-job-small.png" alt="', $this->translate->_("Re-run Job"), '" border="0" hspace="2">';
+                echo '<span class="ui-icon ui-icon-gear"></span>';
                 echo '</a>';
             }
         ?>
