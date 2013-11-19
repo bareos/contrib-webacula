@@ -19,8 +19,6 @@
  */
 
 define('WEBACULA_VERSION', '5.5.2' . ', build 2011.11.01');
-define('BACULA_VERSION', 2001); // Bacula Catalog version
-
 define('ROOT_DIR', dirname(dirname(__FILE__)) );
 define('CACHE_DIR',  ROOT_DIR.'/data/cache' );
 
@@ -88,7 +86,15 @@ else {
 }
 
 // set self version
-Zend_Registry::set('bacula_version',   BACULA_VERSION);
+if( isset($config->general->catalog->version) ) {
+	define('BACULA_VERSION', $config->general->catalog->version);
+	Zend_Registry::set('bacula_version', $config->general->catalog->version);
+}
+else {
+	echo '<pre>';
+	throw new Zend_Exception("Fatal error: Catalog version not set in application/config.ini");
+	echo '</pre>';
+}
 Zend_Registry::set('webacula_version', WEBACULA_VERSION);
 
 // set global const
@@ -185,15 +191,25 @@ try {
     // возможно СУБД не запущена
     throw new Zend_Exception("Fatal error: Can't connect to SQL server");
 }
+
 /*
- * Check Bacula Catalog version
+ * Check Bacula catalog version
  */
-$ver = new Version();
-if ( !$ver->checkVesion(BACULA_VERSION) )   {
-    echo '<pre>';
-    throw new Zend_Exception("Bacula version mismatch for the Catalog database. ". 
-            "Wanted ".BACULA_VERSION.", got ". $ver->getVesion().". ");
+if( isset($config->general->catalog->version) ) {
+	$ver = new Version();
+	if(! $ver->checkVesion($config->general->catalog->version) ) {
+		echo '<pre>';
+		throw new Zend_Exception("Fatal error: Catalog version mismatch. " 
+				. "Catalog version is " . $ver->getVesion() . ", but we've got " . $config->general->catalog->version . " by config.ini settings.");
+		echo '</pre>';
+	}
 }
+else {
+	echo '<pre>';
+	throw new Zend_Exception("Fatal error: Catalog version not set in application/config.ini");
+	echo '</pre>';
+}
+
 /*
  * Check CACHE_DIR is writable
  */
