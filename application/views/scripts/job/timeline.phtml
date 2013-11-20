@@ -2,6 +2,7 @@
 <script type="text/javascript" src="<?php echo $this->baseUrl , '/scripts/jquery-ui.datepicker-', $this->language, '.js';?>"></script>
 
 <script type="text/javascript">
+
 $(function() {
     // http://docs.jquery.com/UI/Datepicker/formatDate
     $('#datetimeline').datepicker({
@@ -10,54 +11,50 @@ $(function() {
         changeYear: true
     });
 });
+
 </script>
 
+<div class="ui-widget-content ui-corner-all" style="width: 1024px; padding: 10px;">
+<?php echo "<h3 class='ui-widget-header ui-corner-all' style='padding: 10px; color: #2388b4'>" . $this->escape($this->translate->_($this->title)) . "</h3>"; ?>
+
 <!--  date form -->
+<p>
 <form action="<?php echo $this->baseUrl; ?>/job/timeline" method="POST">
-<table cellspacing="0" cellpadding="0" border="0"
-    style="font-family: Sans-Serif; margin-bottom: 1.5em; margin-left:6em; margin-top: 1em;">
-<caption style="font-weight: bold; font-size: 1.2em;"><?php echo $this->escape($this->title); ?></caption>
+<table cellspacing="0" cellpadding="0" border="0" style="font-size: 10pt;">
 <tr>
-    <td align="right" valign="top">
-        <b style="margin-right:1em;"><?php print $this->translate->_("Date"); ?></b>
-    </td><td>
+    <td style="padding-right: 5px;">
+    <?php print $this->translate->_("Date"); ?>
+    </td>
+    <td style="padding-right: 5px;">
     <a href="<?php echo $this->baseUrl; ?>/job/timeline/datetimeline/<?php echo date('Y-m-d', strtotime($this->datetimeline)-86400 );?>"
         title="<?php echo $this->translate->_("Previous day"); ?>">
-        <img src="<?php echo $this->baseUrl;?>/images/arrow-left.png"
-             alt="<?php echo $this->translate->_("Previous day"); ?>" border="0" hspace="0" align="absmiddle">
+	<div class="ui-button ui-state-default ui-corner-all" style="padding: 5px;"><span class="ui-icon ui-icon-seek-prev"></span></div>
     </a>
-    </td><td>
+    </td>
+    <td style="padding-right: 5px;">
     <a href="<?php echo $this->baseUrl; ?>/job/timeline/datetimeline/<?php echo date('Y-m-d', time() );?>"
         title="<?php echo $this->translate->_("Today"); ?>">
-        <img src="<?php echo $this->baseUrl;?>/images/user-online.png"
-             alt="<?php echo $this->translate->_("Today"); ?>" border="0" hspace="0" align="absmiddle">
+	<div class="ui-button ui-state-default ui-corner-all" style="padding: 5px;"><span class="ui-icon ui-icon-stop"></span></div>
     </a>
-    </td><td>
+    </td>
+    <td style="padding-right: 5px;">
     <a href="<?php echo $this->baseUrl; ?>/job/timeline/datetimeline/<?php echo date('Y-m-d', strtotime($this->datetimeline)+86400 );?>"
         title="<?php echo $this->translate->_("Next day"); ?>"
         style="margin-right:0.5em;">
-        <img src="<?php echo $this->baseUrl;?>/images/arrow-right.png"
-             alt="<?php echo $this->translate->_("Next day"); ?>" border="0" hspace="0" align="absmiddle">
+	<div class="ui-button ui-state-default ui-corner-all" style="padding: 5px;"><span class="ui-icon ui-icon-seek-next"></span></div>
     </a>
     </td><td>
 <?php echo $this->formText('datetimeline', $this->datetimeline, array('size' => 12)) ?>
     </td><td valign="top">
-        <input type="submit" name="ok" style="margin-left:1em;" value="<?php print $this->translate->_("Show Timeline"); ?>">
+        <input class="ui-button ui-state-default ui-corner-all" type="submit" name="ok" style="margin-left:1em;" value="<?php print $this->translate->_("Show Timeline"); ?>">
     </td>
-</tr>
-<tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td><div style="font-size:70%;"><?php print $this->translate->_("YYYY-MM-DD"); ?></div></td>
-    <td></td>
 </tr>
 </table>
 </form>
+</p>
 
 <?php if ( $this->img_map ) : ?>
-<span style="font:60%;font-family: arial, verdana, sans-serif;">
+<span style="font-size: 9pt; font-family: arial, verdana, sans-serif;">
     <?php echo $this->translate->_("Point mouse cursor at image area and click to view Job detail"); ?>
 </span><br>
 <map name="map1">
@@ -134,3 +131,6 @@ if ( extension_loaded('gd') ) : ?>
 </div>
 <div style="clear: both;"><!--  --></div>
 <?php endif; ?>
+
+</div>
+
