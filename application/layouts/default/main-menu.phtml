@@ -91,14 +91,13 @@ if ( !$cache->start($this->identity->role_id . '_main_menu') ) :
         </ul>
     </li>
     <?php endif; ?>
-
-    <?php if ($this->webacula_acl->isAllowed($this->identity->role_name, 'help') ) : ?>
-    <li><a href="<?php echo $this->baseUrl;?>/help/"><?php print $this->translate->_("Help"); ?></a>
-    </li>
-    <?php endif; ?>
     
     <li><a><?php print $this->translate->_("User"); print ": "; print $this->identity->login; ?></a>
     <ul>
+    	<?php if ($this->webacula_acl->isAllowed($this->identity->role_name, 'help') ) : ?>
+    	<li><a href="<?php echo $this->baseUrl;?>/help/"><?php print $this->translate->_("Help"); ?></a>
+    	</li>
+    	<?php endif; ?>
 	<li><a href="<?php echo $this->url( array('controller'=>'auth', 'action'=>'logout'), 'default', true) ?>">
         <?php print $this->translate->_("Logout"); ?></a>
 	</li>
