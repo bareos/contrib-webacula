@@ -197,10 +197,10 @@ try {
  */
 if( isset($config->general->catalog->version) ) {
 	$ver = new Version();
-	if(! $ver->checkVesion($config->general->catalog->version) ) {
+	if(! $ver->checkVersion($config->general->catalog->version) ) {
 		echo '<pre>';
 		throw new Zend_Exception("Fatal error: Catalog version mismatch. " 
-				. "Catalog version is " . $ver->getVesion() . ", but we've got " . $config->general->catalog->version . " by config.ini settings.");
+				. "Catalog version is " . $ver->getVersion() . ", but we've got " . $config->general->catalog->version . " by config.ini settings.");
 		echo '</pre>';
 	}
 }

@@ -46,7 +46,7 @@ class HelpController extends MyClass_ControllerAclAction
         
         Zend_Loader::loadClass('Version');
         $ver = new Version();
-        $this->view->catalog_version_bacula = $ver->getVesion();
+        $this->view->catalog_version_bacula = $ver->getVersion();
 
         Zend_Loader::loadClass('Director');
         $dir = new Director();
