@@ -46,7 +46,7 @@ class Version extends Zend_Db_Table
         parent::_setupTableName();
     }
 
-    function getVesion()
+    function getVersion()
 	{
    		$select = new Zend_Db_Select($this->db);
     	$select->from('Version', 'VersionId');
@@ -62,9 +62,9 @@ class Version extends Zend_Db_Table
      * @param $ver  valid version
 	 * @return TRUE if correct
 	 */
-	function checkVesion($ver)
+	function checkVersion($ver)
 	{
-    	$res = $this->getVesion();
+    	$res = $this->getVersion();
 		return ( $res == $ver );
 	}
 
