@@ -19,7 +19,7 @@ fi
 ARGS="$@"
 shift $#
 source /usr/lib/bareos/scripts/bareos-config
-set $ARGS
+set -- $ARGS
 
 get_config()
 {
@@ -74,11 +74,11 @@ get_sql_cmd()
     local CMD=""
 
     case "`get_database_driver`" in
-        postgreql)
+        postgresql)
             cmd_postgres=`get_config "cmd_postgres"`
             if [ "${db_host}" -a "${db_host}" != "localhost" ]; then
                 if [ "$WEBACULA_INTERACTIVE" = "no" ]; then
-                    echo "failed: no database command for non-interactive mode available"
+                    echo "failed: no database command for non-interactive mode available" >&2
                     CMD="false"
                 else
                     CMD=`get_config "cmd_remote_postgres"`
@@ -91,7 +91,7 @@ get_sql_cmd()
             cmd_mysql=`get_config "cmd_mysql"`
             if [ "${db_host}" -a "${db_host}" != "localhost" ]; then
                 if [ "$WEBACULA_INTERACTIVE" = "no" ]; then
-                    echo "failed: no database command for non-interactive mode available"
+                    echo "failed: no database command for non-interactive mode available" >&2
                     CMD="false"
                 else
                     CMD=`get_config "cmd_remote_mysql"`
@@ -100,6 +100,9 @@ get_sql_cmd()
                 CMD=`get_config "cmd_local_mysql"`
             fi
             ;;
+        *)
+            echo "failed: unknown database backend" >&2
+            CMD="false"
     esac
 
     echo "$CMD"
@@ -134,7 +137,7 @@ configure_postgres()
         echo "SKIPPED: ${PG_HBA_CONF}: user $db_user is already configured"
     else
         if [ -w ${PG_HBA_CONF} ]; then
-            sed -r -i "s@^(#\s*TYPE\s*DATABASE\s*USER\s*CIDR-ADDRESS\s*METHOD)@\1\n${PG_HBA_WEBACULA}@" ${PG_HBA_CONF}
+            sed -r -i "s@^(#\s*TYPE\s+DATABASE\s+USER\s+.*ADDRESS\s+METHOD)@\1\n${PG_HBA_WEBACULA}@" ${PG_HBA_CONF}
             su - postgres -c "pg_ctl reload"
         fi
     fi
@@ -241,7 +244,7 @@ if [ $args -ge 1 ]; then
         $*
         exit $?
     else
-        echo "failed to execute $*. Not found."
+        echo "failed to execute $*. Not found." >&2
         #usage
         exit 127
     fi
