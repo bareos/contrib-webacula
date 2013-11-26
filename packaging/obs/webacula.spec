@@ -18,6 +18,7 @@ BuildRequires: sudo
 Requires: bareos-bconsole bareos-common
 Requires: php >= 5.2.4
 Requires: php-ZendFramework >= 1.8.3
+Requires: php-ZendFramework-captcha
 Requires: php-pdo
 Requires: php-json
 Requires: php-pcre
