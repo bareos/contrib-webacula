@@ -49,7 +49,7 @@
                 echo '<a href="';
                 echo $this->baseUrl, '/job/run-job/jobname/', $this->escape($line['jobname']);
                 echo '" title="', $this->translate->_("Re-run Job"), '">';
-                echo '<img src="', $this->baseUrl, '/images/re-run-job-small.png" alt="', $this->translate->_("Re-run Job"), '" border="0" hspace="2">';
+                echo '<span class="ui-icon ui-icon-gear"></span>';
                 echo '</a>';
             }
         ?>

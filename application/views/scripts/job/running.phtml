@@ -171,7 +171,7 @@
         echo '<a href="';
         echo $this->baseUrl, '/job/cancel-job/jobid/', $this->escape($line['jobid']);
         echo '" title="', $this->translate->_("Cancel"), '">';
-        echo '<img src="', $this->baseUrl, '/images/process-stop.png" alt="', $this->translate->_("Cancel"), '" border="0" hspace="1">';
+	echo '<span class="ui-icon ui-icon-closethick"></span>';
         echo '</a>';
     ?>
     </td>
