@@ -1,0 +1,27 @@
+This work was packaged for Debian by:
+
+    Jörg Steffens <joerg.steffens@bareosorg> on Wed, 27 Nov 2013 16:52:57 +0100
+
+It was downloaded from:
+
+    https://github.com/bareos/contrib-webacula
+
+Upstream Author(s):
+
+    Yuri Timofeev <tim4dev@gmail.com>
+
+Copyright:
+
+    Copyright (C) 2012 Yuri Timofee
+
+License:
+
+    GPL-3+
+
+The Debian packaging is:
+
+    Copyright (C) 2013 Joerg Steffens <joerg.steffens@bareos.org>
+
+and is licensed under the GPL version 3,
+see "/usr/share/common-licenses/GPL-3".
+

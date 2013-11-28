@@ -1,4 +1,4 @@
 # allow apache to run bconsole. required for webacula
 Cmnd_Alias BCONSOLE = /usr/sbin/bconsole -n -c /etc/bareos/bconsole.conf, /usr/sbin/bconsole -n -c /etc/webacula/bconsole.conf
 Defaults!BCONSOLE !requiretty
-wwwrun,apache ALL=(root) NOPASSWD: BCONSOLE
+wwwrun,www-data,apache ALL=(root) NOPASSWD: BCONSOLE

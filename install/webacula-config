@@ -146,14 +146,19 @@ configure_postgres()
 
     PG_HBA_CONF=`su - postgres -c "psql --no-align --tuples-only -c 'SHOW hba_file;'"`
 
-    PG_HBA_WEBACULA="\n# webacula access rules\nhost    $db_name    $db_user    127.0.0.1/32    md5\nhost    $db_name    $db_user    ::1/128         md5\n"
-
     if grep -q "$db_user" ${PG_HBA_CONF}; then
         echo "SKIPPED: ${PG_HBA_CONF}: user $db_user is already configured"
     else
         if [ -w ${PG_HBA_CONF} ]; then
+            PG_HBA_WEBACULA="\n# webacula access rules\nhost    $db_name    $db_user    127.0.0.1/32    md5\nhost    $db_name    $db_user    ::1/128         md5\n"
             sed -r -i "s@^(#\s*TYPE\s+DATABASE\s+USER\s+.*ADDRESS\s+METHOD)@\1\n${PG_HBA_WEBACULA}@" ${PG_HBA_CONF}
-            su - postgres -c "pg_ctl reload"
+            if type -p pg_ctl > /dev/null 2>&1; then
+                su - postgres -c "pg_ctl reload" || ((error+=1))
+            elif [ -r /etc/init.d/postgresql ]; then
+                /etc/init.d/postgresql || ((error+=1))
+            else
+                echo "WARN: please reload PostgreSql database"
+            fi
         fi
     fi
 
