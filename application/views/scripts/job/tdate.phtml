@@ -39,11 +39,12 @@ echo "</script>";
       <div id="accordion">
       
       <h3><a href="#"><?php echo $this->translate->_("Date"); ?></a></h3>
+      
       <div>
       <form action="<?php echo $this->baseUrl; ?>/job/tdate" method="POST">
       <p>
       <div id="dpick"><?php print $this->translate->_("Date"); ?><input type="text" id="datepicker" name="datepicker" title="<?php echo $this->translate->_("Please enter a date"); ?>" /></div>
-      <p/>
+      </p>
       <input id="showTimeline" type="submit" value="<?php print $this->translate->_("Show Timeline"); ?>" />
       </form>
       </div>
@@ -54,7 +55,7 @@ echo "</script>";
       <p>
       <div id="rpick"><?php print $this->translate->_('From'); ?><input type="text" id="from" name="from" title="<?php echo $this->translate->_("Please enter a date"); ?>" />
       <?php print $this->translate->_('to'); ?><input type="text" id="to" name="to" title="<?php echo $this->translate->_("Please enter a date"); ?>" /></div>
-      <p/> 
+      </p> 
       <input id="showTimeline" type="submit" value="<?php print $this->translate->_("Show Timeline"); ?>" />
       </form>
       </div>
@@ -68,7 +69,7 @@ echo "</script>";
 
 	if( empty( $this->result_error) ) {
 		echo '<div class="ui-widget-content" style="width: 1024px; padding: 10px; text-align: center;">';
-		echo '<div id="jobtimeline" class="ui-widget-content" style="z-index: 1; width: 1024px; height: 550px; border: 1px solid #aaa; font-size: 12px;"></div>';
+		echo '<div id="jobtimeline" class="ui-widget-content" style="z-index: 1; width: 1024px; height: 350px; border: 1px solid #aaa; font-size: 12px;"></div>';
 		echo '</div>';
 	}
 	else {
