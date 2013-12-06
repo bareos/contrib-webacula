@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2007, 2008, 2009, 2010 Yuri Timofeev tim4dev@gmail.com
+ * Copyright 2007, 2008, 2009, 2010, 2011 Yuri Timofeev tim4dev@gmail.com
  *
  * Webacula is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -567,7 +567,7 @@ class Timeline
                     'm2' => "(strftime('%M',EndTime))"));
                     break;
             }
-
+            $select->joinLeft(array('sd'=> 'webacula_jobdesc'), 'Job.Name = sd.name_job');
             $select->where("(StartTime >= '$date 00:00:00') AND (StartTime <= '$date 23:59:59') AND
                 (EndTime <= '$date 23:59:59')");
             $select->order('JobId');
@@ -581,6 +581,7 @@ class Timeline
 			foreach($result as $line)	{
 				$this->atime[$i]['jobid'] = $line['jobid'];
 				$this->atime[$i]['name'] = $line['name'];
+                $this->atime[$i]['short_desc'] = $line['short_desc'];
     			$this->atime[$i]['h1'] = $line['h1'] + ($line['m1'] / 60);
     			$this->atime[$i]['h2'] = $line['h2'] + ($line['m2'] / 60);
     			$this->atime[$i]['flag'] = 0; // признак, что задание уложилось в сутки
@@ -597,6 +598,7 @@ class Timeline
 			// задания, старт или окончание которых лежат за пределами указанных суток
 
 			// задание началось ранее
+            // либо задание еще длится
 
 			// ********** query 2 *******************
 			$select = new Zend_Db_Select($db);
@@ -620,15 +622,15 @@ class Timeline
                 // HH24 - hour of day (00-23)
                 // MI   - minute (00-59)
                 $select->from('Job', array(
-                	'JobId', 'Name', 'StartTime', 'EndTime', 'JobErrors', 'JobStatus',
-					'h1' => "to_char(StartTime, 'HH24')",
-					'm1' => "to_char(StartTime, 'MI')",
-					'h2' => "to_char(EndTime, 'HH24')",
-					'm2' => "to_char(EndTime, 'MI')"));
+                    'JobId', 'Name', 'StartTime', 'EndTime', 'JobErrors', 'JobStatus',
+                    'h1' => "to_char(StartTime, 'HH24')",
+                    'm1' => "to_char(StartTime, 'MI')",
+                    'h2' => "to_char(EndTime, 'HH24')",
+                    'm2' => "to_char(EndTime, 'MI')"));
                 break;
-			case 'PDO_SQLITE':
-				// SQLite3 Documentation
-				// http://sqlite.org/lang_datefunc.html
+            case 'PDO_SQLITE':
+                // SQLite3 Documentation
+                // http://sqlite.org/lang_datefunc.html
                 // %H - Hour (00 .. 23)
                 // %M - Minute (00 .. 59)
                 // bug http://framework.zend.com/issues/browse/ZF-884
@@ -638,24 +640,34 @@ class Timeline
                     'm1' => "(strftime('%M',StartTime))",
                     'h2' => "(strftime('%H',EndTime))",
                     'm2' => "(strftime('%M',EndTime))"));
-				break;
+                break;
             }
+            $select->joinLeft(array('sd'=> 'webacula_jobdesc'), 'Job.Name = sd.name_job');
+                $select->where(
+                "( 
+                    (EndTime > '$date 00:00:00') AND 
+                    ( 
+                        (EndTime <= '$date 23:59:59') OR 
+                        ( 
+                            (EndTime IS NULL) AND 
+                            (Job.jobstatus IN ('R', 'B', 'A', 'F', 'S', 'm', 'M', 's', 'j', 'c', 'd', 't', 'p', 'i', 'a', 'l', 'L') ) 
+                        ) 
+                    ) 
+                )
+                AND
+                (StartTime < '$date 00:00:00')");
+            $select->order('JobId');
 
+            //$sql = $select->__toString(); echo "<pre>$sql</pre>"; exit; // for !!!debug!!!
 
-    		$select->where("(EndTime > '$date 00:00:00') AND (EndTime <= '$date 23:59:59') AND
-		    	(StartTime < '$date 00:00:00')");
-
-			$select->order('JobId');
-
-			//$sql = $select->__toString(); echo "<pre>$sql</pre>"; exit; // for !!!debug!!!
-
-    		$stmt = $select->query();
-			$result = $stmt->fetchAll();
+            $stmt = $select->query();
+            $result = $stmt->fetchAll();
 
 			// забиваем результат в массив
 			foreach($result as $line)	{
 				$this->atime[$i]['jobid'] = $line['jobid'];
 				$this->atime[$i]['name'] = $line['name'];
+                $this->atime[$i]['short_desc'] = $line['short_desc'];
 				$this->atime[$i]['h1'] = 0;
     			$this->atime[$i]['h2'] = $line['h2'] + ($line['m2'] / 60);
     			$this->atime[$i]['flag'] = -1; // признак, что задание началось ранее
@@ -669,13 +681,14 @@ class Timeline
 			unset($stmt);
 
 
-			// задание закончилось позднее
-			// ********** query 3 *******************
-			$select = new Zend_Db_Select($db);
+                // задание закончилось позднее
+                // либо задание еще длится
+		// ********** query 3 *******************
+		$select = new Zend_Db_Select($db);
     		$select->distinct();
 
     		switch ($this->db_adapter) {
-            case 'PDO_MYSQL':
+                case 'PDO_MYSQL':
                 // http://dev.mysql.com/doc/refman/5.0/en/date-and-time-functions.html#function_date-format
                 // %H - Hour (00..23)
                 // %i - Minutes, numeric (00..59)
@@ -709,12 +722,20 @@ class Timeline
 					'h2' => "(strftime('%H',EndTime))",
 					'm2' => "(strftime('%M',EndTime))"));
             }
-
-    		$select->where("(StartTime >= '$date 00:00:00') AND (StartTime <= '$date 23:59:59') AND
-				(EndTime > '$date 23:59:59')");
-
+            $select->joinLeft(array('sd'=> 'webacula_jobdesc'), 'Job.Name = sd.name_job');
+            $select->where(
+                "( 
+                    (StartTime >= '$date 00:00:00') AND (StartTime <= '$date 23:59:59') 
+                ) AND
+				( 
+                    (EndTime > '$date 23:59:59') OR 
+                    (
+                        (EndTime IS NULL) AND
+                        (Job.jobstatus IN ('R', 'B', 'A', 'F', 'S', 'm', 'M', 's', 'j', 'c', 'd', 't', 'p', 'i', 'a', 'l', 'L') )
+                    )
+                )"
+            );
 			$select->order('JobId');
-
 			//$sql = $select->__toString(); echo "<pre>$sql</pre>"; exit; // for !!!debug!!!
 
     		$stmt = $select->query();
@@ -724,6 +745,7 @@ class Timeline
 			foreach($result as $line)	{
 				$this->atime[$i]['jobid'] = $line['jobid'];
 				$this->atime[$i]['name'] = $line['name'];
+                $this->atime[$i]['short_desc'] = $line['short_desc'];
 				$this->atime[$i]['h1'] = $line['h1'] + ($line['m1'] / 60);
     			$this->atime[$i]['h2'] = 23.9;
     			$this->atime[$i]['flag'] = 1; // признак, что задание окончилось позднее
@@ -737,6 +759,7 @@ class Timeline
 			unset($stmt);
 
 			// задание началось ранее и закончилось позднее (очень длинное задание)
+            // либо задание еще длится
 			// ********** query 4 *******************
 			$select = new Zend_Db_Select($db);
     		$select->distinct();
@@ -779,8 +802,17 @@ class Timeline
 					'm2' => "(strftime('%M',EndTime))"));
                  break;
             }
-
-    		$select->where("(StartTime < '$date 00:00:00') AND (EndTime > '$date 23:59:59')");
+            $select->joinLeft(array('sd'=> 'webacula_jobdesc'), 'Job.Name = sd.name_job');
+    		$select->where(
+                "(StartTime < '$date 00:00:00') AND 
+                ( 
+                    (EndTime > '$date 23:59:59') OR 
+                    (
+                        (EndTime IS NULL) AND
+                        (Job.jobstatus IN ('R', 'B', 'A', 'F', 'S', 'm', 'M', 's', 'j', 'c', 'd', 't', 'p', 'i', 'a', 'l', 'L') )
+                    )
+                )"
+            );
 			$select->order('JobId');
 			//$sql = $select->__toString(); echo "<pre>$sql</pre>"; exit; // for !!!debug!!!
 
@@ -791,6 +823,7 @@ class Timeline
             foreach($result as $line)    {
 				$this->atime[$i]['jobid'] = $line['jobid'];
 				$this->atime[$i]['name'] = $line['name'];
+                $this->atime[$i]['short_desc'] = $line['short_desc'];
 				$this->atime[$i]['h1'] = 0;
     			$this->atime[$i]['h2'] = 23.9;
     			$this->atime[$i]['flag'] = 2; // признак, что задание началось ранее и окончилось позднее (очень длинное задание)
@@ -978,7 +1011,7 @@ class Timeline
         $c = 0;
 
         for ($i = 0; $i <= $this->bar_count-1; $i++)  {
-            $str = $this->atime[$i]['name'] . " (" . $this->atime[$i]['jobid'] . ")";
+            $str = '(' . $this->atime[$i]['jobid'] .') '. $this->atime[$i]['name'];
             // для заданий не уложившихся в сутки, рисуем знаки с определенной стороны
             switch ($this->atime[$i]['flag']) {
                 case -1:
@@ -1056,6 +1089,7 @@ class Timeline
                 ($xt < $xr1) ? $x1 = $xt : $x1 = $xr1;
                 $img_map[$i]['jobid'] = $this->atime[$i]['jobid'];
                 $img_map[$i]['name']  = $this->atime[$i]['name'];
+                $img_map[$i]['short_desc']  = $this->atime[$i]['short_desc'];
                 $img_map[$i]['x1'] = $x1;
                 $img_map[$i]['y1'] = $yr1;
                 $img_map[$i]['x2'] = $x2;

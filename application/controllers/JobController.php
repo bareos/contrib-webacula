@@ -33,22 +33,9 @@ class JobController extends MyClass_ControllerAclAction
         Zend_Loader::loadClass('Job');
         Zend_Loader::loadClass('Timeline');
         Zend_Loader::loadClass('Director');
-        
-        //$ajaxContext = $this->_helper->getHelper('AjaxContext');
-        //$ajaxContext->addActionContext('jsondaterange', 'json')->initContext();
-        
     }
 
-    function indexAction() {
-    }
-    
-    /**
-     * 
-     */
-    function jsondaterangeAction() {
-    
-    }  
-    
+
     /**
      * Terminated Jobs (executed in last 24 hours)
      *
@@ -60,6 +47,7 @@ class JobController extends MyClass_ControllerAclAction
         $jobs = new Job();
         $this->view->result = $jobs->getTerminatedJobs();
         $this->view->meta_refresh = 300; // meta http-equiv="refresh"
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
     }
 
 
@@ -78,6 +66,7 @@ class JobController extends MyClass_ControllerAclAction
         $this->view->titleDirRunningJobs  = $this->view->translate->_("Information from Director : List of Running Jobs");
         $this->view->resultDirRunningJobs = $jobs->getDirRunningJobs();
         $this->view->meta_refresh = 300; // meta http-equiv="refresh"
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
     }
 
     /**
@@ -99,6 +88,7 @@ class JobController extends MyClass_ControllerAclAction
         } else {
             $this->_helper->viewRenderer->setResponseSegment('job_running');
         }
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
     }
 
 
@@ -117,6 +107,7 @@ class JobController extends MyClass_ControllerAclAction
         $jobs = new Job();
         $this->view->result = $jobs->getScheduledJobs();
         $this->view->meta_refresh = 300; // meta http-equiv="refresh"
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
     }
 
     /**
@@ -140,6 +131,7 @@ class JobController extends MyClass_ControllerAclAction
         } else {
             $this->_helper->viewRenderer->setResponseSegment('job_next');
         }
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
     }
 
 
@@ -187,7 +179,8 @@ class JobController extends MyClass_ControllerAclAction
         $this->view->jstatus    = $jstatus;
         $this->view->jtype      = $jtype;
         $this->view->volname    = $volname;
-
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
+        
         if ($jobs) {
             $paginator = Zend_Paginator::factory($jobs);
             Zend_Paginator::setDefaultScrollingStyle('Sliding');
@@ -212,6 +205,7 @@ class JobController extends MyClass_ControllerAclAction
         $jobid = intval(trim( $this->_request->getParam('jobid') ));
         $job = new Job();
         $this->view->result = $job->getByJobId($jobid);
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
         echo $this->renderScript('job/terminated.phtml');
     }
 
@@ -229,6 +223,7 @@ class JobController extends MyClass_ControllerAclAction
         $jobname = trim( $this->_request->getParam('jobname') );
         $job = new Job();
         $this->view->result = $job->getByJobName($jobname);
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
         echo $this->renderScript('job/terminated.phtml');
     }
 
@@ -246,6 +241,7 @@ class JobController extends MyClass_ControllerAclAction
         $volname = addslashes(trim( $this->_request->getParam('volname') ));
         $job = new Job();
         $this->view->result = $job->getByVolumeName($volname);
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
         echo $this->renderScript('job/terminated.phtml');
     }
 
@@ -295,6 +291,7 @@ class JobController extends MyClass_ControllerAclAction
         $adetail = $job->getDetailByJobId($jobid);
         $this->view->resultJob = $adetail['job'];
         $this->view->resultVol = $adetail['volume'];
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
     }
 
 
@@ -316,6 +313,7 @@ class JobController extends MyClass_ControllerAclAction
         $jobs = new Job();
         $this->view->result = $jobs->getProblemJobs($last_days);
         $this->view->meta_refresh = 300; // meta http-equiv="refresh"
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
     }
 
     /**
@@ -330,6 +328,7 @@ class JobController extends MyClass_ControllerAclAction
         // get data from model
         $jobs = new Job();
         $this->view->result = $jobs->getProblemJobs($last_days);
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
         if ( empty($this->view->result) ) {
             $this->_helper->viewRenderer->setNoRender();
         } else {
@@ -338,104 +337,36 @@ class JobController extends MyClass_ControllerAclAction
     }
 
     /**
-     * tdateAction
+     * Graph timeline for Jobs
      */
-    function tdateAction() {
-    
-	$datetimeline = $this->_request->getParam('datepicker', date('Y-m-d', time() ) );
-	
-	Zend_Loader::loadClass('Zend_Validate_Date');
+    function timelineAction()
+    {
+        // http://localhost/webacula/job/timeline/
+        $datetimeline = addslashes(trim( $this->_request->getParam('datetimeline', date('Y-m-d', time()) ) ));
+        Zend_Loader::loadClass('Zend_Validate_Date');
         $validator = new Zend_Validate_Date();
-	if ( !$validator->isValid($datetimeline) ) {
-	    $this->view->title = $this->view->translate->_("Timeline");
-            $this->view->err_msg = $validator->getMessages();
+        if ( !$validator->isValid($datetimeline) ) {
+            $this->view->err_msg = $validator->getMessages(); // сообщения валидатора
             $this->view->result = null;
-	    $this->view->result_error = 'Invalid date';
             return;
         }
-	
-	$this->view->title = $this->view->translate->_("Timeline for date ") . $datetimeline;
-	$this->view->datetimeline = $datetimeline;
-	
-	$timeline = new Timeline;
-	
-	$jsondataNamespace = new Zend_Session_Namespace('JSON_DATA');
-	$jsondataNamespace->tldata = $timeline->getJobDataByDateAsJSON($datetimeline);
-	
-	
-	
-	if( empty($jsondataNamespace->tldata) ) {
-	  $this->view->result_error = $this->view->translate->_('No jobs found');	
-	}
-	
-    }
-    
-    /**
-     * rdateAction
-     */
-    function rdateAction() {
-    
-	$fromdate = $this->_request->getParam('from', date('Y-m-d', time() ) ); 
-	$todate = $this->_request->getParam('to', date('Y-m-d', time() ) );
-	
-	Zend_Loader::loadClass('Zend_Validate_Date');
-        $validator = new Zend_Validate_Date();
-	if ( !$validator->isValid($fromdate) || !$validator->isValid($todate) ) {
-	    $this->view->title = $this->view->translate->_("Timeline");
-            $this->view->err_msg = $validator->getMessages();
+        if ( !extension_loaded('gd') ) {
+            // No GD lib (php-gd) found
             $this->view->result = null;
-	    $this->view->result_error = 'Invalid date';
+            $this->getResponse()->setHeader('Content-Type', 'text/html; charset=utf-8');
+            throw new Zend_Exception($this->view->translate->_('ERROR: The GD extension isn`t loaded. Please install php-gd package.'));
             return;
         }
-        
-	$this->view->datetimeline = $fromdate;
-	$this->view->fromdate = $fromdate;
-	$this->view->todate = $todate;
-	$this->view->title = $this->view->translate->_("Timeline for $fromdate to $todate");
-	
-	$timeline = new Timeline;
-	
-	$jsondataNamespace = new Zend_Session_Namespace('JSON_DATA');
-	$jsondataNamespace->tldata = $timeline->getJobDataByDateRangeAsJSON($fromdate, $todate);
-	
-	if( empty($jsondataNamespace->tldata) ) {
-	  $this->view->result_error = $this->view->translate->_('No jobs found');	
-	}
-	
-    }
-    
-    /**
-     * timelineAction (last 24h)
-     */
-    function timelineAction() {
-
-	$date = new DateTime(date('r'));
-	$date = $date->format('Y-m-d');
-	$datetimeline = $date;
-	
-	$this->view->title = $this->view->translate->_("Timeline for the last 24 hours");
-	$this->view->datetimeline = $datetimeline;
-	
-	$timeline = new Timeline;
-	
-	$jsondataNamespace = new Zend_Session_Namespace('JSON_DATA');
-	$jsondataNamespace->tldata = $timeline->getJobDataLast24hAsJSON($datetimeline);
-	
-        if( empty($jsondataNamespace->tldata) ) {
-	  $this->view->result_error = $this->view->translate->_('No jobs found');	
-	}
-
+        $this->view->title = $this->view->translate->_("Timeline for date") . " " . $datetimeline;
+        $timeline = new Timeline;
+        $this->view->datetimeline = $datetimeline;
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
+        // for image map
+        $this->view->img_map = $timeline->createTimelineImage($datetimeline, false, null, 'normal');
     }
 
-    /**
-     * timelinejsonAction (json output for our timeline)
-     */
-    function timelinejsonAction() {
-	$this->_helper->Layout->disableLayout();
-    }
-    
-    
-    // TODO review or drop!
+
+
     function timelineDashboardAction()
     {
     	if ($this->_helper->hasHelper('layout'))
@@ -450,12 +381,15 @@ class JobController extends MyClass_ControllerAclAction
         $this->view->title = $this->view->translate->_("Timeline for date") . " " . $datetimeline;
         $timeline = new Timeline;
         $this->view->img_map = $timeline->createTimelineImage($datetimeline, false, null, 'small');
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
         if ( empty($this->view->img_map) ) {
             $this->_helper->viewRenderer->setNoRender();
         } else {
             $this->_helper->viewRenderer->setResponseSegment('job_timeline');
         }
     }
+
+
 
     /**
      * Run Job
@@ -578,6 +512,7 @@ EOF"
         $this->view->title = sprintf($this->view->translate->_("List last %s Jobs run"), $numjob);
         $job = new Job();
         $this->view->result = $job->getLastJobRun($numjob);
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
         echo $this->renderScript('job/terminated.phtml');
     }
 
@@ -593,11 +528,10 @@ EOF"
         $this->view->title = $this->view->translate->_("Terminated Jobs (executed in last 24 hours)");
         $job = new Job();
         $this->view->result = $job->getTerminatedJobs();
-        if ( empty($this->view->result) ) {
+        if ( empty($this->view->result) ) 
             $this->_helper->viewRenderer->setNoRender();
-        } else {
+        else
             $this->_helper->viewRenderer->setResponseSegment('job_terminated');
-        }
     }
 
     /**
@@ -627,6 +561,7 @@ EOF"
         $this->view->result = $job->getByFileName($path, $namefile, $client, $limit, $type_search);
         $this->view->title = sprintf($this->view->translate->_("List Jobs (%s found) where '%s' is saved (limit %s)"),
             sizeof($this->view->result), $namefile, $limit);
+        $this->view->show_job_description = Zend_Registry::get('show_job_description');
     }
 
 
@@ -637,6 +572,13 @@ EOF"
      */
     function cancelJobAction()
     {
+        // do Bacula ACLs
+        $command = 'cancel';
+        if ( !$this->bacula_acl->doOneBaculaAcl($command, 'command') ) {
+        	$msg = sprintf( $this->view->translate->_('You try to run Bacula Console with command "%s".'), $command );
+            $this->_forward('bacula-access-denied', 'error', null, array('msg' => $msg ) ); // action, controller
+            return;
+        }
         $this->view->title = $this->view->translate->_("Cancel Job");
         $jobid = trim( $this->_request->getParam('jobid') );
         $this->view->jobid = $jobid;
@@ -665,5 +607,40 @@ EOF"
         echo $this->renderScript('job/run-job-output.phtml');
     }
 
+    
+    /**
+     * show job
+     * http://www.bacula.org/3.0.x-manuals/en/console/console/Bacula_Console.html
+     * show job=<xxx>
+     */
+    function showJobAction()
+    {
+        // do Bacula ACLs
+        $command = 'show';
+        if ( !$this->bacula_acl->doOneBaculaAcl($command, 'command') ) {
+        	$msg = sprintf( $this->view->translate->_('You try to run Bacula Console with command "%s".'), $command );
+            $this->_forward('bacula-access-denied', 'error', null, array('msg' => $msg ) ); // action, controller
+            return;
+        }
+        $this->view->title = $this->view->translate->_("Show Job resource");
+        $jobname = trim( $this->_request->getParam('jobname') );
+        $this->view->jobname = $jobname;
+        $director = new Director();
+        if ( !$director->isFoundBconsole() )    {
+            $this->view->result_error = 'NOFOUND_BCONSOLE';
+            $this->render();
+            return;
+        }
+        $astatusdir = $director->execDirector(
+" <<EOF
+show job=\"$jobname\"
+EOF"
+        );
+        $this->view->command_output = $astatusdir['command_output'];
+        // check return status of the executed command
+        if ( $astatusdir['return_var'] != 0 )   {
+            $this->view->result_error = $astatusdir['result_error'];
+        }
+    }
 
 }
