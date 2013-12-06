@@ -45,12 +45,10 @@ class Timeline
     protected $fixfont;
     protected $bacula_acl; // bacula acl
     protected $config;
-
-
-
-
+    
     public function __construct()
     {
+    
         $this->db_adapter = Zend_Registry::get('DB_ADAPTER');
         $this->config = Zend_Registry::get('config');
         $this->atime = array();
@@ -60,8 +58,520 @@ class Timeline
         $this->bar_height = ceil($this->font_size * 2);
         $this->bar_space  = ceil($this->bar_height * 0.7);
         $this->bacula_acl = new MyClass_BaculaAcl();
+        
     }
+    
+    /**
+     * getJobDataByDateRange
+     */
+    private function getJobDataByDateRange($from, $to) {
+    
+	if( !empty($from) && !empty($to) ) {
+	    
+	    $db = Zend_Db_Table::getDefaultAdapter();
+	    
+	    $select = new Zend_Db_Select($db);
+	    
+	    switch($this->db_adapter) {
+		
+		case 'PDO_PGSQL':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		case 'PDO_MYSQL':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		case 'PDO_SQLITE':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		    
+	    }
+	    
+	    $select->where("
+	      (StartTime >= '$from 00:00:00') AND 
+	      (StartTime <= '$to 23:59:59') AND
+	      (EndTime >= '$from 00:00:00') AND 
+	      (EndTime <= '$to 23:59:59')
+	    ");
+                
+	    $stmt = $select->query();
+	    
+	    // do Bacula ACLs
+	    $res = $this->bacula_acl->doBaculaAcl( $stmt->fetchAll(), 'name', 'job');
+	    
+	    return $res;
+	    
+	}
+	else {
+	
+	  return null;
+	  
+	}
+    
+    }
+    
+    /**
+     * getJobDataByDate
+     */
+    private function getJobDataByDate($date) {
+    
+	if( !empty($date) ) {
+	    
+	    $db = Zend_Db_Table::getDefaultAdapter();
+	    
+	    $select = new Zend_Db_Select($db);
+	    
+	    switch($this->db_adapter) {
+		
+		case 'PDO_PGSQL':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		case 'PDO_MYSQL':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		case 'PDO_SQLITE':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		    
+	    }
+	    
+	    $select->where("
+		(StartTime >= '$date 00:00:00') AND 
+		(StartTime <= '$date 23:59:59') AND
+                (EndTime <= '$date 23:59:59')");
+                
+	    $stmt = $select->query();
+	    
+	    // do Bacula ACLs
+	    $res = $this->bacula_acl->doBaculaAcl( $stmt->fetchAll(), 'name', 'job');
+	    
+	    return $res;
+	    
+	}
+	else {
+	
+	  return null;
+	
+	}
+    
+    }
+    
+    /**
+     * getJobDataLast24h
+     */
+    private function getJobDataLast24h($date) {
+    
+	if( !empty($date) ) {
+	    
+	    $db = Zend_Db_Table::getDefaultAdapter();
+	    
+	    $select = new Zend_Db_Select($db);
+	    
+	    switch($this->db_adapter) {
+		
+		case 'PDO_PGSQL':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		case 'PDO_MYSQL':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		case 'PDO_SQLITE':
+		    $select->from('job', array(
+			'JobId', 'Name', 'StartTime', 'EndTime',
+			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
+			));
+		    break;
+		    
+	    }
+	    
+	    // GET TIMESTAMPS
+	    $current_timestamp = time();
+	    $start_timestamp = time() - (60*60*24);
+	    
+	    $t_start = date("Y-m-d H:i:s", $start_timestamp); 
+	    //$t_end = date("Y-m-d H:i:s");
+	    
+	    $select->where("(StartTime >= '$t_start') AND (EndTime >= '$t_start')");
+                
+	    $stmt = $select->query();
+	    
+	    // do Bacula ACLs
+	    $res = $this->bacula_acl->doBaculaAcl( $stmt->fetchAll(), 'name', 'job');
+	    
+	    return $res;
+	    
+	}
+	else {
+	  
+	    return null;
+	  
+	}
+    
+    }
+    
+    /**
+     * getJobDataByDateRangeAsJSON
+     */
+    public function getJobDataByDateRangeAsJSON($from, $to) {
+      
+      $data[] = array();
+      $data = $this->getJobDataByDateRange($from, $to);
+      
+      if( !empty($data) ) {
+	
+	$i = 0;
+	    
+	    while( $i < count($data) ) {
+	    
+		// JOB NAME
+		$jobname = $data[$i]['name'] . " (Job ID: " . $data[$i]['jobid']  . ")";
+	    
+		// SCHEDULED STARTTIME
+		$start_date = explode("-", $data[$i]['schedtime']);
+		$s_time = explode(" ", $data[$i]['schedtime']);
+		$start_time = explode(":", $s_time[1]);
+		$start = mktime(
+			      (integer)$start_time[0], 
+			      (integer)$start_time[1], 
+			      (integer)$start_time[2], 
+			      (integer)$start_date[1], 
+			      (integer)$start_date[2], 
+			      (integer)$start_date[0]
+			      );
+	    
+		// ENDTIME
+		$end_date = explode("-", $data[$i]['endtime']);
+		$e_time = explode(" ", $data[$i]['endtime']);
+		$end_time = explode(":", $e_time[1]);
+		$end = mktime(
+			      (integer)$end_time[0],
+			      (integer)$end_time[1], 
+			      (integer)$end_time[2], 
+			      (integer)$end_date[1], 
+			      (integer)$end_date[2], 
+			      (integer)$end_date[0]
+			      );
+		
+		// REAL STARTTIME
+		$real_start_time = explode("-", $data[$i]['starttime']);
+		$r_time = explode(" ", $data[$i]['starttime']);
+		$real_start = explode(":", $r_time[1]);
+		$starttime = mktime(
+			      (integer)$real_start[0], 
+			      (integer)$real_start[1], 
+			      (integer)$real_start[2], 
+			      (integer)$real_start_time[1], 
+			      (integer)$real_start_time[2], 
+			      (integer)$real_start_time[0]
+			      );
+	    
+		$desc = "Job ID: " . $data[$i]['jobid'];
+		$jlink = "/webacula/job/detail/jobid/" . $data[$i]['jobid'];
+		$jobstatus = (string) $data[$i]['jobstatus'];
+		
+		// Colours
+		if( $jobstatus == "T" ) {
+			$color = "#66a266";
+		}
+		else if( $jobstatus == "f" || $jobstatus == "e" || $jobstatus == "E") {
+			$color = "#ff7f7f";
+		}
+		else if( $jobstatus == "A" ) {
+			$color = "#ffff66";
+		}
+		else if( $jobstatus == "R" ) {
+			$color = "#ccccff";
+		}
+		else {
+			$color = "#ffdb99";
+		}
+		
+		$jobs[] = array(
+		
+		    'start' => date("M d Y H:i:s T", $start),
+		    'end' => date("M d Y H:i:s T", $end),
+		    'latestStart' => date("M d Y H:i:s T", $starttime),
+		    'title' => $jobname,
+		    'description' => $desc,
+		    'link' => $jlink,
+		    'durationEvent' => true,
+		    'color' => $color,
+		    'textColor' => "black"
+		    
+		);
+	    
+		++$i;
+	    
+	    }
+	    
+	    $json = array(
+		'dateTimeFormat' => 'Gregorian',
+		'events' => $jobs
+	    );
+	    
+	    $json_encoded = json_encode($json);
+	    
+	return $json_encoded;
+	
+      }
+      else {
+      
+	return null;
+      
+      }
+      
+    }
+    
+    /**
+     * getJobDataLast24hAsJSON
+     */
+    public function getJobDataLast24hAsJSON($date) {
+      
+      $data[] = array();
+      $data = $this->getJobDataLast24h($date);
+      
+      if( !empty($data) ) {
+	
+	$i = 0;
+	    
+	    while( $i < count($data) ) {
+	    
+		// JOB NAME
+		$jobname = $data[$i]['name'] . " (Job ID: " . $data[$i]['jobid']  . ")";
+	    
+		// SCHEDULED STARTTIME
+		$start_date = explode("-", $data[$i]['schedtime']);
+		$s_time = explode(" ", $data[$i]['schedtime']);
+		$start_time = explode(":", $s_time[1]);
+		$start = mktime(
+			      (integer)$start_time[0], 
+			      (integer)$start_time[1], 
+			      (integer)$start_time[2], 
+			      (integer)$start_date[1], 
+			      (integer)$start_date[2], 
+			      (integer)$start_date[0]
+			      );
+	    
+		// ENDTIME
+		$end_date = explode("-", $data[$i]['endtime']);
+		$e_time = explode(" ", $data[$i]['endtime']);
+		$end_time = explode(":", $e_time[1]);
+		$end = mktime(
+			      (integer)$end_time[0],
+			      (integer)$end_time[1], 
+			      (integer)$end_time[2], 
+			      (integer)$end_date[1], 
+			      (integer)$end_date[2], 
+			      (integer)$end_date[0]
+			      );
+			      
+		// REAL STARTTIME
+		$real_start_time = explode("-", $data[$i]['starttime']);
+		$r_time = explode(" ", $data[$i]['starttime']);
+		$real_start = explode(":", $r_time[1]);
+		$starttime = mktime(
+			      (integer)$real_start[0], 
+			      (integer)$real_start[1], 
+			      (integer)$real_start[2], 
+			      (integer)$real_start_time[1], 
+			      (integer)$real_start_time[2], 
+			      (integer)$real_start_time[0]
+			      );
+	    
+		$desc = "Job ID: " . $data[$i]['jobid'];
+		$jlink = "/webacula/job/detail/jobid/" . $data[$i]['jobid'];
+		$jobstatus = (string) $data[$i]['jobstatus'];
+		
+		// Colours
+		if( $jobstatus == "T" ) {
+			$color = "#66a266";
+		}
+		else if( $jobstatus == "f" || $jobstatus == "e" || $jobstatus == "E") {
+			$color = "#ff7f7f";
+		}
+		else if( $jobstatus == "A" ) {
+			$color = "#ffff66";
+		}
+		else if( $jobstatus == "R" ) {
+			$color = "#ccccff";
+		}
+		else {
+			$color = "#ffdb99";
+		}
 
+		$jobs[] = array(
+		
+		    'start' => date("M d Y H:i:s T", $start),
+		    'latestStart' => date("M d Y H:i:s T", $starttime),
+		    'end' => date("M d Y H:i:s T", $end),
+		    'earliestEnd' => date("M d Y H:i:s T", $end),
+		    'title' => $jobname,
+		    'description' => $desc,
+		    'link' => $jlink,
+		    'durationEvent' => true,
+		    'color' => $color,
+		    'textColor' => "black"
+		    
+		);
+	    
+		++$i;
+	    
+	    }
+	    
+	    $json = array(
+		'dateTimeFormat' => 'Gregorian',
+		'events' => $jobs
+	    );
+	    
+	    $json_encoded = json_encode($json);
+	
+	return $json_encoded;
+	
+      }
+      else {
+      
+	return null;
+      
+      }
+      
+    }
+    
+    /**
+     * getJobDataByDateAsJSON
+     */
+    public function getJobDataByDateAsJSON($date) {
+	    
+	    $data[] = array();
+	    $data = $this->getJobDataByDate($date);
+
+	    if( !empty($data) ) {
+
+	    $i = 0;
+	    
+	    while( $i < count($data) ) {
+	    
+		// JOB NAME
+		$jobname = $data[$i]['name'] . " (Job ID: " . $data[$i]['jobid']  . ")";
+	    
+		// SCHEDULED STARTTIME
+		$start_date = explode("-", $data[$i]['schedtime']);
+		$s_time = explode(" ", $data[$i]['schedtime']);
+		$start_time = explode(":", $s_time[1]);
+		$start = mktime(
+			      (integer)$start_time[0], 
+			      (integer)$start_time[1], 
+			      (integer)$start_time[2], 
+			      (integer)$start_date[1], 
+			      (integer)$start_date[2], 
+			      (integer)$start_date[0]
+			      );
+	    
+		// ENDTIME
+		$end_date = explode("-", $data[$i]['endtime']);
+		$e_time = explode(" ", $data[$i]['endtime']);
+		$end_time = explode(":", $e_time[1]);
+		$end = mktime(
+			      (integer)$end_time[0],
+			      (integer)$end_time[1], 
+			      (integer)$end_time[2], 
+			      (integer)$end_date[1], 
+			      (integer)$end_date[2], 
+			      (integer)$end_date[0]
+			      );
+			      
+		// REAL STARTTIME
+		$real_start_time = explode("-", $data[$i]['starttime']);
+		$r_time = explode(" ", $data[$i]['starttime']);
+		$real_start = explode(":", $r_time[1]);
+		$starttime = mktime(
+			      (integer)$real_start[0], 
+			      (integer)$real_start[1], 
+			      (integer)$real_start[2], 
+			      (integer)$real_start_time[1], 
+			      (integer)$real_start_time[2], 
+			      (integer)$real_start_time[0]
+			      );
+	    
+		$desc = "Job ID: " . $data[$i]['jobid'];
+		$jlink = "/webacula/job/detail/jobid/" . $data[$i]['jobid'];
+		$jobstatus = (string) $data[$i]['jobstatus'];
+		
+		// Colours
+		if( $jobstatus == "T" ) {
+			$color = "#66a266";
+		}
+		else if( $jobstatus == "f" || $jobstatus == "e" || $jobstatus == "E") {
+			$color = "#ff7f7f";
+		}
+		else if( $jobstatus == "A" ) {
+			$color = "#ffff66";
+		}
+		else if( $jobstatus == "R" ) {
+			$color = "#ccccff";
+		}
+		else {
+			$color = "#ffdb99";
+		}
+		
+		$jobs[] = array(
+		
+		    'start' => date("M d Y H:i:s T", $start), 
+		    'end' => date("M d Y H:i:s T", $end),
+		    'latestStart' => date("M d Y H:i:s T", $starttime),
+		    'title' => $jobname,
+		    'description' => $desc,
+		    'link' => $jlink,
+		    'durationEvent' => true,
+		    'color' => $color,
+		    'textColor' => "black"
+		    
+		);
+	    
+		++$i;
+	    
+	    }
+	    
+	    $json = array(
+		'dateTimeFormat' => 'Gregorian',
+		'events' => $jobs
+	    );
+	    
+	    $json_encoded = json_encode($json);
+	  
+	    return $json_encoded;
+	    
+	    }
+	    else {
+	    
+		return null;
+
+	    }
+
+    }
+    
     /**
      * Put data from DB to 2D array
      *

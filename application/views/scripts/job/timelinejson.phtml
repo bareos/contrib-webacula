@@ -1,0 +1,21 @@
+<?php
+
+error_reporting(FALSE);
+
+header('Content-Type: application/json; charset=utf-8');
+
+function pushJSON() 
+{
+
+  $jsondataNamespace = new Zend_Session_Namespace('JSON_DATA');
+  
+  if(isset($jsondataNamespace->tldata))
+  {
+    echo $jsondataNamespace->tldata;
+  }
+  
+}
+
+pushJSON();
+
+?> 

@@ -20,6 +20,24 @@ header("Pragma: no-cache");                                     // HTTP/1.0
                 echo $this->escape($this->title);
         ?>
     </title>
+
+<!-- Timeline -->
+
+<script type="text/javascript">
+	Timeline_ajax_url="<?php echo $this->baseUrl; ?>/scripts/timeline/timeline_ajax/simile-ajax-api.js";
+	Timeline_urlPrefix="<?php echo $this->baseUrl; ?>/scripts/timeline/timeline_js/";
+	Timeline_parameters="bundle=true";
+</script>
+
+<script language="javascript" type="text/javascript" src="<?php echo $this->baseUrl; ?>/scripts/timeline/timeline_js/timeline-api.js?bundle=true"></script>
+<script language="javascript" type="text/javascript" src="<?php echo $this->baseUrl; ?>/scripts/timeline/loader.js"></script>
+
+<script type="text/javascript">
+	SimileAjax.History.enabled = false;
+</script>
+
+<!-- Timeline -->
+    
     <link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->baseUrl; ?>/styles/<?php echo $this->config->layout->path; ?>/site.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->baseUrl; ?>/styles/<?php echo $this->config->layout->path; ?>/wblogbook.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->baseUrl; ?>/styles/<?php echo $this->config->layout->path; ?>/wbjobdesc.css" />
