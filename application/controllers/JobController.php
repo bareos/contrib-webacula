@@ -337,35 +337,99 @@ class JobController extends MyClass_ControllerAclAction
     }
 
     /**
-     * Graph timeline for Jobs
+     * tdateAction
      */
-    function timelineAction()
-    {
-        // http://localhost/webacula/job/timeline/
-        $datetimeline = addslashes(trim( $this->_request->getParam('datetimeline', date('Y-m-d', time()) ) ));
-        Zend_Loader::loadClass('Zend_Validate_Date');
+    function tdateAction() {
+    
+	$datetimeline = $this->_request->getParam('datepicker', date('Y-m-d', time() ) );
+	
+	Zend_Loader::loadClass('Zend_Validate_Date');
         $validator = new Zend_Validate_Date();
-        if ( !$validator->isValid($datetimeline) ) {
-            $this->view->err_msg = $validator->getMessages(); // сообщения валидатора
+	if ( !$validator->isValid($datetimeline) ) {
+	    $this->view->title = $this->view->translate->_("Timeline");
+            $this->view->err_msg = $validator->getMessages();
             $this->view->result = null;
+	    $this->view->result_error = 'Invalid date';
             return;
         }
-        if ( !extension_loaded('gd') ) {
-            // No GD lib (php-gd) found
+	
+	$this->view->title = $this->view->translate->_("Timeline for date ") . $datetimeline;
+	$this->view->datetimeline = $datetimeline;
+	
+	$timeline = new Timeline;
+	
+	$jsondataNamespace = new Zend_Session_Namespace('JSON_DATA');
+	$jsondataNamespace->tldata = $timeline->getJobDataByDateAsJSON($datetimeline);
+	
+	if( empty($jsondataNamespace->tldata) ) {
+	  $this->view->result_error = $this->view->translate->_('No jobs found');	
+	}
+	
+    }
+    
+    /**
+     * rdateAction
+     */
+    function rdateAction() {
+    
+	$fromdate = $this->_request->getParam('from', date('Y-m-d', time() ) ); 
+	$todate = $this->_request->getParam('to', date('Y-m-d', time() ) );
+	
+	Zend_Loader::loadClass('Zend_Validate_Date');
+        $validator = new Zend_Validate_Date();
+	if ( !$validator->isValid($fromdate) || !$validator->isValid($todate) ) {
+	    $this->view->title = $this->view->translate->_("Timeline");
+            $this->view->err_msg = $validator->getMessages();
             $this->view->result = null;
-            $this->getResponse()->setHeader('Content-Type', 'text/html; charset=utf-8');
-            throw new Zend_Exception($this->view->translate->_('ERROR: The GD extension isn`t loaded. Please install php-gd package.'));
+	    $this->view->result_error = 'Invalid date';
             return;
         }
-        $this->view->title = $this->view->translate->_("Timeline for date") . " " . $datetimeline;
-        $timeline = new Timeline;
-        $this->view->datetimeline = $datetimeline;
-        $this->view->show_job_description = Zend_Registry::get('show_job_description');
-        // for image map
-        $this->view->img_map = $timeline->createTimelineImage($datetimeline, false, null, 'normal');
+        
+	$this->view->datetimeline = $fromdate;
+	$this->view->fromdate = $fromdate;
+	$this->view->todate = $todate;
+	$this->view->title = $this->view->translate->_("Timeline for $fromdate to $todate");
+	
+	$timeline = new Timeline;
+	
+	$jsondataNamespace = new Zend_Session_Namespace('JSON_DATA');
+	$jsondataNamespace->tldata = $timeline->getJobDataByDateRangeAsJSON($fromdate, $todate);
+	
+	if( empty($jsondataNamespace->tldata) ) {
+	  $this->view->result_error = $this->view->translate->_('No jobs found');	
+	}
+	
+    }
+    
+    /**
+     * timelineAction (last 24h)
+     */
+    function timelineAction() {
+
+	$date = new DateTime(date('r'));
+	$date = $date->format('Y-m-d');
+	$datetimeline = $date;
+	
+	$this->view->title = $this->view->translate->_("Timeline for the last 24 hours");
+	$this->view->datetimeline = $datetimeline;
+	
+	$timeline = new Timeline;
+	
+	$jsondataNamespace = new Zend_Session_Namespace('JSON_DATA');
+	$jsondataNamespace->tldata = $timeline->getJobDataLast24hAsJSON($datetimeline);
+	
+        if( empty($jsondataNamespace->tldata) ) {
+	  $this->view->result_error = $this->view->translate->_('No jobs found');	
+	}
+
     }
 
-
+    /**
+     * timelinejsonAction (json output for our timeline)
+     */
+    function timelinejsonAction() {
+	$this->_helper->Layout->disableLayout();
+    }
 
     function timelineDashboardAction()
     {
