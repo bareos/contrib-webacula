@@ -262,7 +262,7 @@ class Timeline
 			      (integer)$start_date[0]
 			      );
 	    
-		// SCHEDULED ENDTIME
+		// ENDTIME
 		$end_date = explode("-", $data[$i]['endtime']);
 		$e_time = explode(" ", $data[$i]['endtime']);
 		$end_time = explode(":", $e_time[1]);
@@ -274,7 +274,7 @@ class Timeline
 			      (integer)$end_date[2], 
 			      (integer)$end_date[0]
 			      );
-			      
+		
 		// REAL STARTTIME
 		$real_start_time = explode("-", $data[$i]['starttime']);
 		$r_time = explode(" ", $data[$i]['starttime']);
@@ -290,16 +290,36 @@ class Timeline
 	    
 		$desc = "Job ID: " . $data[$i]['jobid'];
 		$jlink = "/webacula/job/detail/jobid/" . $data[$i]['jobid'];
-
+		$jobstatus = (string) $data[$i]['jobstatus'];
+		
+		// Colours
+		if( $jobstatus == "T" ) {
+			$color = "#66a266";
+		}
+		else if( $jobstatus == "f" || $jobstatus == "e" || $jobstatus == "E") {
+			$color = "#ff7f7f";
+		}
+		else if( $jobstatus == "A" ) {
+			$color = "#ffff66";
+		}
+		else if( $jobstatus == "R" ) {
+			$color = "#ccccff";
+		}
+		else {
+			$color = "#ffdb99";
+		}
+		
 		$jobs[] = array(
 		
-		    'start' => date("M d Y H:i:s T", $start), 
+		    'start' => date("M d Y H:i:s T", $start),
 		    'end' => date("M d Y H:i:s T", $end),
 		    'latestStart' => date("M d Y H:i:s T", $starttime),
 		    'title' => $jobname,
 		    'description' => $desc,
 		    'link' => $jlink,
-		    'durationEvent' => false
+		    'durationEvent' => true,
+		    'color' => $color,
+		    'textColor' => "black"
 		    
 		);
 	    
@@ -355,7 +375,7 @@ class Timeline
 			      (integer)$start_date[0]
 			      );
 	    
-		// SCHEDULED ENDTIME
+		// ENDTIME
 		$end_date = explode("-", $data[$i]['endtime']);
 		$e_time = explode(" ", $data[$i]['endtime']);
 		$end_time = explode(":", $e_time[1]);
@@ -383,7 +403,25 @@ class Timeline
 	    
 		$desc = "Job ID: " . $data[$i]['jobid'];
 		$jlink = "/webacula/job/detail/jobid/" . $data[$i]['jobid'];
+		$jobstatus = (string) $data[$i]['jobstatus'];
 		
+		// Colours
+		if( $jobstatus == "T" ) {
+			$color = "#66a266";
+		}
+		else if( $jobstatus == "f" || $jobstatus == "e" || $jobstatus == "E") {
+			$color = "#ff7f7f";
+		}
+		else if( $jobstatus == "A" ) {
+			$color = "#ffff66";
+		}
+		else if( $jobstatus == "R" ) {
+			$color = "#ccccff";
+		}
+		else {
+			$color = "#ffdb99";
+		}
+
 		$jobs[] = array(
 		
 		    'start' => date("M d Y H:i:s T", $start),
@@ -393,7 +431,9 @@ class Timeline
 		    'title' => $jobname,
 		    'description' => $desc,
 		    'link' => $jlink,
-		    'durationEvent' => false
+		    'durationEvent' => true,
+		    'color' => $color,
+		    'textColor' => "black"
 		    
 		);
 	    
@@ -449,7 +489,7 @@ class Timeline
 			      (integer)$start_date[0]
 			      );
 	    
-		// SCHEDULED ENDTIME
+		// ENDTIME
 		$end_date = explode("-", $data[$i]['endtime']);
 		$e_time = explode(" ", $data[$i]['endtime']);
 		$end_time = explode(":", $e_time[1]);
@@ -477,7 +517,25 @@ class Timeline
 	    
 		$desc = "Job ID: " . $data[$i]['jobid'];
 		$jlink = "/webacula/job/detail/jobid/" . $data[$i]['jobid'];
-
+		$jobstatus = (string) $data[$i]['jobstatus'];
+		
+		// Colours
+		if( $jobstatus == "T" ) {
+			$color = "#66a266";
+		}
+		else if( $jobstatus == "f" || $jobstatus == "e" || $jobstatus == "E") {
+			$color = "#ff7f7f";
+		}
+		else if( $jobstatus == "A" ) {
+			$color = "#ffff66";
+		}
+		else if( $jobstatus == "R" ) {
+			$color = "#ccccff";
+		}
+		else {
+			$color = "#ffdb99";
+		}
+		
 		$jobs[] = array(
 		
 		    'start' => date("M d Y H:i:s T", $start), 
@@ -486,7 +544,9 @@ class Timeline
 		    'title' => $jobname,
 		    'description' => $desc,
 		    'link' => $jlink,
-		    'durationEvent' => false
+		    'durationEvent' => true,
+		    'color' => $color,
+		    'textColor' => "black"
 		    
 		);
 	    

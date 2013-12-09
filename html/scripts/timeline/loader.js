@@ -10,8 +10,8 @@ function loadTimeline(data, date) {
 	// Theme modification
 	jobtheme.event.bubble.width = 350;
 	jobtheme.event.bubble.height = 250;
-	jobtheme.event.track.height = 30;
-	jobtheme.event.tape.height = 16;
+	jobtheme.event.track.height = 20;
+	jobtheme.event.tape.height = 10;
 	jobtheme.autoWidth = true;
 
 	var bandInfos = [
@@ -22,7 +22,7 @@ function loadTimeline(data, date) {
 	      theme:		jobtheme,
 	      width:		"10%",
 	      intervalUnit:	Timeline.DateTime.DAY,
-	      intervalPixels:	100,
+	      intervalPixels:	400,
 	      showEventText:	false,
 	      overview:		true,
 	      layout:		'overview'
