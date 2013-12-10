@@ -12,12 +12,6 @@ db.config.password =
 db.config.dbname = bacula
 ;; for Sqlite db.config.dbname = "/full patch/bacula.db"
 
-;; Bacula/Bareos catalog version
-;; If you are unsure what value to set here, please consult your bareos/bacula catalog database version table.
-;; Supported bacula catalog versions: 12
-;; Supported bareos catalog versions: 2001
-catalog.version = 2001
-
 ;; see http://www.php.net/timezones
 ; def.timezone = "UTC"
 def.timezone = "Europe/Minsk"
