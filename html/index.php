@@ -119,6 +119,19 @@ Zend_Db_Table::setDefaultAdapter($db_bacula);
 Zend_Registry::set('db_bacula', $db_bacula);
 unset($params);
 
+# get username the Bareos/Bacula accesses the database.
+# This is required to grant him also permissions to read the tables,
+# otherwise the default database backup script fails
+if( isset($config->general->db->username_director) ) {
+    $db_username_director = $config->general->db->username_director;
+} else {
+    # if not set, take default
+    $db_username_director = "bareos";
+}
+Zend_Registry::set('DB_USER_DIRECTOR', $db_username_director );
+unset( $db_username_director );
+
+
 // setup controller, exceptions/errors handler
 $frontController = Zend_Controller_Front::getInstance();
 $frontController->setControllerDirectory('../application/controllers');

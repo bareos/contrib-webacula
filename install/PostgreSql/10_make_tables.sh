@@ -48,6 +48,16 @@ CREATE TABLE webacula_jobdesc (
 CREATE INDEX webacula_idx2 ON webacula_jobdesc (name_job);
 CREATE INDEX webacula_idx3 ON webacula_jobdesc (short_desc);
 
+-- list if tables to restore files
+CREATE TABLE webacula_tmp_tablelist (
+    tmpId    SERIAL NOT NULL,
+    tmpName  CHAR(64) UNIQUE NOT NULL,
+    tmpJobIdHash CHAR(64) NOT NULL,
+    tmpCreate   timestamp without time zone NOT NULL,
+    tmpIsCloneOk SMALLINT DEFAULT 0,
+    PRIMARY KEY(tmpId)
+);
+
 CREATE TABLE webacula_version (
    versionId INTEGER NOT NULL
 );
@@ -73,18 +83,6 @@ BEGIN
 END;
 \$\$
 LANGUAGE 'plpgsql';
-
-
--- grants
-
-GRANT all ON webacula_logbook TO ${db_user};
-GRANT all ON webacula_logtype TO ${db_user};
-GRANT all ON webacula_jobdesc TO ${db_user};
-GRANT SELECT, REFERENCES ON webacula_version TO ${db_user};
-
-GRANT SELECT, UPDATE ON webacula_logbook_logid_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_logtype_typeid_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_jobdesc_desc_id_seq TO ${db_user};
 
 -- execute access
 GRANT EXECUTE ON FUNCTION webacula_clone_file(vTbl TEXT, vFileId INT, vPathId INT, vFilenameId INT, vLStat TEXT, vMD5 TEXT, visMarked INT, vFileSize INT) TO ${db_user};

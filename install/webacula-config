@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # script that does all needed steps to run webacula
-# use at own risk
 
 set -o errexit -o nounset
 
@@ -21,11 +20,21 @@ shift $#
 source /usr/lib/bareos/scripts/bareos-config
 set -- $ARGS
 
-get_config()
+get_config_value()
 {
     local PARAM=$1
     shift
     eval echo `sed -r -n "s/^${PARAM}[ ]*=[ ]*//p" $WEBACULA_CONFIG`
+}
+
+get_config()
+{
+    local PARAM=$1
+    local DEFAULT=${2:-""}
+    shift
+    local RESULT=`get_config_value $PARAM`
+    [ "$RESULT" ] || RESULT=$DEFAULT
+    echo "$RESULT"
 }
 
 set_config()
@@ -55,6 +64,7 @@ get_db_param()
     export db_name=`get_config "db.config.dbname"`
     export db_user=`get_config "db.config.username"`
     export db_password=`get_config "db.config.password"`
+    export db_user_director=`get_config "db.config.username_director" "bareos"`
 }
 
 get_db_user()
@@ -65,6 +75,13 @@ get_db_user()
 get_db_password()
 {
     get_config "db.config.password"
+}
+
+get_db_user_director()
+{
+    # get the database user name,
+    # that the Bareos/Bacula director uses to access the database
+    get_config "db.config.username_director"
 }
 
 
@@ -142,6 +159,14 @@ configure_postgres()
         fi
     fi
 
+    # If webacula uses another database user as the Bareos/Bacula director itself,
+    # grant read permissions to the Bareos/Bacula director user.
+    # This revents problems with the catalog backup script,
+    # otherwise it fails because it doesn't have read permissions for all tables.
+    if [ "$db_user" != "$db_user_director" ]; then
+        db_user=$db_user_director /usr/share/webacula/install/PostgreSql/30_grant_privileges.sh readonly
+    fi
+
     return $error
 }
 
@@ -193,7 +218,7 @@ init()
     # grant database permissions,
     # adapt webacula config file accordingly
 
-    # TODO: check if bareos is running and what database it uses
+    # TODO: check if bareos is running
     BAREOS_DATABASE=`get_database_driver`
 
     # if webacula is not already configured

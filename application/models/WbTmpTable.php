@@ -52,6 +52,7 @@ class WbTmpTable extends Zend_Db_Table
     public function __construct($jobidhash, $ttl_restore_session)
     {
         $this->db_adapter = Zend_Registry::get('DB_ADAPTER');
+        $this->db_user_director = Zend_Registry::get('DB_USER_DIRECTOR');
         $this->jobidhash = $jobidhash;
         $this->ttl_restore_session = $ttl_restore_session;
         // формируем имена временных таблиц
@@ -89,6 +90,7 @@ class WbTmpTable extends Zend_Db_Table
                         tmpCreate   timestamp without time zone NOT NULL,
                         tmpIsCloneOk SMALLINT DEFAULT 0,
                         PRIMARY KEY(tmpId))';
+                $grant = 'GRANT SELECT ON TABLE '. $this->_name .' TO '. $this->db_user_director;
                 break;
             case 'PDO_SQLITE':
                 $sql = 'CREATE TABLE '. $this->_name .' (
@@ -101,6 +103,9 @@ class WbTmpTable extends Zend_Db_Table
                 break;
             }
             $this->_db->query($sql);
+            if( isset( $grant ) ) {
+                $this->_db->query($grant);
+            }
         }
     }
 
@@ -325,47 +330,48 @@ class WbTmpTable extends Zend_Db_Table
             break;
         }
         // создаем таблицы !!! порядок не менять // see also cats/make_mysql_tables.in
-        try {
-            /*
-             * File
-             */
-            // добавлены дополнительные поля : isMarked, FileSize
-            switch ($this->db_adapter) {
+        /*
+         * File
+         */
+        // добавлены дополнительные поля : isMarked, FileSize
+        switch ($this->db_adapter) {
             case 'PDO_MYSQL':
-                $res_file = $this->_db->query("
-                CREATE TABLE " . $this->_db->quoteIdentifier($this->tmp_file) . " (
+                $sql = "CREATE TABLE " . $this->_db->quoteIdentifier($this->tmp_file) . " (
                     JobId  BIGINT UNSIGNED NOT NULL,
                     FileId BIGINT UNSIGNED NOT NULL,
                     FileIndex INTEGER UNSIGNED DEFAULT 0,
                     isMarked INTEGER  UNSIGNED DEFAULT 0,
                     FileSize BIGINT  UNSIGNED DEFAULT 0,
                     PRIMARY KEY(FileId)
-                )");
+                )";
                 break;
             case 'PDO_PGSQL':
-                $res_file = $this->_db->query("
-                CREATE TABLE " . $this->_db->quoteIdentifier($this->tmp_file) . " (
-                    JobId  BIGINT NOT NULL,
-                    FileId BIGINT NOT NULL,
-                    fileindex integer not null  default 0,
-                    isMarked SMALLINT  DEFAULT 0,
-                    FileSize BIGINT  DEFAULT 0,
-                    PRIMARY KEY(FileId)
-                )");
+                $sql = "CREATE TABLE " . $this->_db->quoteIdentifier($this->tmp_file) . " (
+                        JobId  BIGINT NOT NULL,
+                        FileId BIGINT NOT NULL,
+                        fileindex integer not null  default 0,
+                        isMarked SMALLINT  DEFAULT 0,
+                        FileSize BIGINT  DEFAULT 0,
+                        PRIMARY KEY(FileId)
+                    )";
+                $grant = 'GRANT SELECT ON TABLE ' . $this->_db->quoteIdentifier($this->tmp_file) . ' TO ' . $this->db_user_director;
                 break;
             case 'PDO_SQLITE':
-                $res_file = $this->_db->query("
-                CREATE TABLE " . $this->_db->quoteIdentifier($this->tmp_file) . " (
+                $sql = "CREATE TABLE " . $this->_db->quoteIdentifier($this->tmp_file) . " (
                     JobId  INTEGER,
                     FileId INTEGER,
                     FileIndex INTEGER UNSIGNED NOT NULL,
                     isMarked INTEGER  UNSIGNED DEFAULT 0,
                     FileSize INTEGER  UNSIGNED DEFAULT 0,
                     PRIMARY KEY(FileId)
-                )");
+                )";
                 break;
+        }
+        try {
+            $res_file = $this->_db->query( $sql );
+            if( isset( $grant ) ) {
+                $this->_db->query($grant);
             }
-            return TRUE; // all ok
         } catch (Zend_Exception $e) {
             echo '<br><br><br>', __METHOD__, '<br>Caught exception: ', get_class($e),
                 '<br>Message: ', $e->getMessage(), '<br>';
@@ -373,6 +379,7 @@ class WbTmpTable extends Zend_Db_Table
             $this->dropTmpTable($this->tmp_file);
             return FALSE; // error
         }
+        return TRUE; // all ok
     }
 
 

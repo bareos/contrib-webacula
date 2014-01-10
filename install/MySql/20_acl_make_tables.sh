@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS webacula_roles (
     description TEXT,
     inherit_id  integer,
     primary key (id)
-);    
+);
 
 
 CREATE TABLE IF NOT EXISTS webacula_resources (
