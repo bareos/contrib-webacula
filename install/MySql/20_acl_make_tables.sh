@@ -222,7 +222,10 @@ CREATE TABLE IF NOT EXISTS webacula_storage_acl (
 );
 
 
-
+-- originaly the table webacula_where_acl is created 
+-- with a UNIQUE INDEX with name(256).
+-- However, this causes problems depending on the database backend,
+-- therefore if this fails, a UNIQUE INDEX with name(128) is created.
 CREATE TABLE IF NOT EXISTS webacula_where_acl (
     id        integer not null auto_increment,
     name      TEXT NOT NULL,
@@ -231,6 +234,15 @@ CREATE TABLE IF NOT EXISTS webacula_where_acl (
     PRIMARY KEY (id),
     INDEX (id, order_acl),
     UNIQUE INDEX (name(256), role_id)
+);
+CREATE TABLE IF NOT EXISTS webacula_where_acl (
+    id        integer not null auto_increment,
+    name      TEXT NOT NULL,
+    order_acl integer,
+    role_id   integer,
+    PRIMARY KEY (id),
+    INDEX (id, order_acl),
+    UNIQUE INDEX (name(128), role_id)
 );
 
 
