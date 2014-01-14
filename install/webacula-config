@@ -40,8 +40,6 @@ get_config()
 set_config()
 {
     # set settings in the webacula config file.
-    # Limitation: only sets values, if PARAM exists but have no value.
-    #   This should prevent problems if the user already adapts the settings.
     # TODO: section is currently ignored
     local SECTION=$1
     local PARAM=$2
@@ -49,7 +47,7 @@ set_config()
     local error=0
     if grep -q "^${PARAM}" $WEBACULA_CONFIG; then
         echo "$WEBACULA_CONFIG: set [$SECTION] ${PARAM} = ${VALUE}"
-        sed -r -i "s#^${PARAM}[ ]*=[ ]*#${PARAM} = ${VALUE}#" $WEBACULA_CONFIG
+        sed -r -i "s#^${PARAM}[ ]*=.*#${PARAM} = ${VALUE}#" $WEBACULA_CONFIG
     else
         echo "FAILED to set [$SECTION] ${PARAM} = ${VALUE} ($WEBACULA_CONFIG)"
         error=1
@@ -64,7 +62,7 @@ get_db_param()
     export db_name=`get_config "db.config.dbname"`
     export db_user=`get_config "db.config.username"`
     export db_password=`get_config "db.config.password"`
-    export db_user_director=`get_config "db.config.username_director" "bareos"`
+    export db_user_director=`get_config "director.db.username" "bareos"`
 }
 
 get_db_user()
@@ -81,7 +79,7 @@ get_db_user_director()
 {
     # get the database user name,
     # that the Bareos/Bacula director uses to access the database
-    get_config "db.config.username_director"
+    get_config "director.db.username"
 }
 
 

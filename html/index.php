@@ -122,8 +122,8 @@ unset($params);
 # get username the Bareos/Bacula accesses the database.
 # This is required to grant him also permissions to read the tables,
 # otherwise the default database backup script fails
-if( isset($config->general->db->username_director) ) {
-    $db_username_director = $config->general->db->username_director;
+if( isset($config->general->director->db->username) ) {
+    $db_username_director = $config->general->director->db->username;
 } else {
     # if not set, take default
     $db_username_director = "bareos";
