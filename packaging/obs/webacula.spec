@@ -88,7 +88,9 @@ make
 
 
 %install
-%makeinstall
+# makeinstall macro does not work on RedHat
+#makeinstall
+make DESTDIR=%{buildroot} install
 
 
 %post

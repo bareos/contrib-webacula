@@ -584,6 +584,7 @@ PACKAGE_URL=''
 ac_unique_file="configure.ac"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+HTTPD_CONF
 APACHE2_SYSCONFDIR
 APXS
 am__untar
@@ -650,6 +651,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_httpd_conf
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1263,6 +1265,12 @@ if test -n "$ac_init_help"; then
      short | recursive ) echo "Configuration of webacula 5.5.2:";;
    esac
   cat <<\_ACEOF
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-httpd-conf=<path_to_conf>
+                          sets path to Apache conf.d directory
 
 Report bugs to the package provider.
 _ACEOF
@@ -2210,8 +2218,10 @@ am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
 
 
 
-# Extract the first word of "apxs2", so it can be a program name with args.
-set dummy apxs2; ac_word=$2
+for ac_prog in apxs apxs2
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_APXS+:} false; then :
@@ -2237,7 +2247,6 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_path_APXS" && ac_cv_path_APXS="apxs2"
   ;;
 esac
 fi
@@ -2251,7 +2260,33 @@ $as_echo "no" >&6; }
 fi
 
 
+  test -n "$APXS" && break
+done
+test -n "$APXS" || APXS="apxs2"
+
 APACHE2_SYSCONFDIR=`$APXS -q SYSCONFDIR`
+
+
+HTTP_CONF=no
+
+# Check whether --with-httpd_conf was given.
+if test "${with_httpd_conf+set}" = set; then :
+  withval=$with_httpd_conf; HTTPD_CONF=$withval
+else
+  HTTPD_CONF=no
+fi
+
+if test x$HTTPD_CONF = xno; then
+        if test -d /etc/httpd/conf.d; then
+                HTTPD_CONF="/etc/httpd/conf.d"
+        elif test -d /etc/apache2/conf.d; then
+                HTTPD_CONF="/etc/apache2/conf.d"
+        elif test -d /etc/apache/conf.d; then
+                HTTPD_CONF="/etc/apache/conf.d"
+        else
+                HTTPD_CONF="/etc/httpd/conf.d"
+        fi
+fi
 
 
 
