@@ -29,7 +29,7 @@ Requires: sudo
 %if 0%{?suse_version}
 BuildRequires: apache2
 # /usr/sbin/apxs2
-#BuildRequires: apache2-devel
+BuildRequires: apache2-devel
 #define _apache_conf_dir #(/usr/sbin/apxs2 -q SYSCONFDIR)
 %define _apache_conf_dir /etc/apache2/conf.d/
 %define daemon_user  wwwrun
@@ -42,6 +42,8 @@ Suggests:   postgresql-server mysql sqlite3
 %else
 #if 0#{?fedora} || 0#{?rhel_version} || 0#{?centos_version}
 BuildRequires: httpd
+# apxs2
+BuildRequires: httpd-devel
 %define _apache_conf_dir /etc/httpd/conf.d/
 %define daemon_user  apache
 %define daemon_group apache
@@ -75,56 +77,29 @@ Webacula - Web Bacula - веб интерфейс для Bacula backup system.
 бразильский португальский, русский.
 
 
-
 %prep
 %setup -q
-find -name ".htaccess*" -exec rm {} \;
-#rm -f ./application/config.ini.*
+
 
 %build
+#autoreconf -fvi
+%configure
+make
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
-mkdir -p $RPM_BUILD_ROOT%{_apache_conf_dir}
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/cron.daily/
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d/
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
-mkdir -p $RPM_BUILD_ROOT/usr/sbin/
+%makeinstall
 
-
-#install -p -m 755 ./install/webacula_clean_tmp_files.sh \
-#   $RPM_BUILD_ROOT#{_sysconfdir}/cron.daily/webacula_clean_tmp_files.sh
-#rm -f ./install/webacula_clean_tmp_files.sh
-
-cp -pr ./application $RPM_BUILD_ROOT%{_datadir}/%{name}
-cp -pr ./html        $RPM_BUILD_ROOT%{_datadir}/%{name}
-cp -pr ./languages   $RPM_BUILD_ROOT%{_datadir}/%{name}
-cp -pr ./library     $RPM_BUILD_ROOT%{_datadir}/%{name}
-
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/install
-cp -pr install/check_system_requirements.php install/MySql/ install/PostgreSql/ install/SqLite/ $RPM_BUILD_ROOT%{_datadir}/%{name}/install/
-
-cp -p install/apache/webacula.conf  $RPM_BUILD_ROOT%{_apache_conf_dir}/webacula.conf
-
-cp -a install/sudoers.d/webacula-bconsole $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d/
-
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/data/cache
-
-mv $RPM_BUILD_ROOT%{_datadir}/%{name}/application/config.ini  $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config.ini
-ln -s %{_sysconfdir}/%{name}/config.ini  $RPM_BUILD_ROOT%{_datadir}/%{name}/application/config.ini
-
-cp -p install/webacula-config ${RPM_BUILD_ROOT}/usr/sbin/
 
 %post
 # if command a2enmod exists, 
-# use it toenable Apache rewrite module
-type -p a2enmod >/dev/null && a2enmod rewrite > /dev/null
+# use it to enable Apache rewrite module
 LOG=/var/log/webacula-install.log
-export WEBACULA_INTERACTIVE="no"
 echo "`date`: BEGIN webacula-config init" >> $LOG
+which a2enmod >/dev/null && a2enmod rewrite >> $LOG 2>&1
+export WEBACULA_INTERACTIVE="no"
 if /usr/sbin/webacula-config init >> $LOG 2>&1; then
-    echo "SUCCESS: webacula-config init"
+    echo "SUCCESS: webacula-config init, see $LOG"
 else
     echo "FAILED: webacula-config init, see $LOG"
 fi
@@ -163,46 +138,3 @@ rm -rf $RPM_BUILD_ROOT
 %lang(it) %{_datadir}/%{name}/languages/it
 %lang(es) %{_datadir}/%{name}/languages/es
 %lang(cs) %{_datadir}/%{name}/languages/cs
-
-%changelog
-* Tue Nov 02 2013 Jörg Steffens <packager@dass-it.de> 5.5.2.x
-- adapted to Bareos
-
-* Tue Jan 18 2011 Philipp Storz <packager@dass-it.de> 5.0.2-1
-- Port to opensuse build service
-
-* Tue Aug 10 2010 Yuri Timofeev <tim4dev@gmail.com> 5.0.2-1
-- Version 5.0.2
-
-* Thu May 12 2010 Yuri Timofeev <tim4dev@gmail.com> 5.0.1-1
-- Version 5.0.1
-
-* Thu Feb 20 2010 Yuri Timofeev <tim4dev@gmail.com> 5.0-1
-- Version 5.0
-
-* Tue Feb 16 2010 Yuri Timofeev <tim4dev@gmail.com> 3.5-1
-- Version 3.5
-
-* Wed Dec 9 2009 Yuri Timofeev <tim4dev@gmail.com> 3.4.1-1
-- Version 3.4.1
-
-* Fri Oct 16 2009 Yuri Timofeev <tim4dev@gmail.com> 3.4-1
-- Version 3.4
-
-* Tue Oct 13 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-6
-- Fix #526855.
-
-* Tue Oct 13 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-5
-- Fix #526855. Remove Zend Framework from source.
-
-* Tue Oct 13 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-4
-- Fix #526855
-
-* Mon Oct 12 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-3
-- Fix #526855
-
-* Sat Oct 10 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-2
-- Fix #526855 "Review Request"
-
-* Thu Oct 08 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-1
-- Initial Spec file creation for Fedora

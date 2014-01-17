@@ -1,0 +1,56 @@
+webacula (5.5.2.2-1) unstable; urgency=low
+
+  * added Debian/Ubuntu packages
+
+ -- Joerg Steffens <joerg.steffens@bareos.com>  Fri, 17 Jan 2014 11:52:57 +0100
+
+webacula (5.5.2.1-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Joerg Steffens <joerg.steffens@bareos.com>  Wed, 27 Nov 2013 16:52:57 +0100
+
+webacula (5.0.2-1) unstable; urgency=low
+
+  * old changlog
+   * Tue Jan 18 2011 Philipp Storz <packager@dass-it.de> 5.0.2-1
+   - Port to opensuse build service
+
+   * Tue Aug 10 2010 Yuri Timofeev <tim4dev@gmail.com> 5.0.2-1
+   - Version 5.0.2
+
+   * Thu May 12 2010 Yuri Timofeev <tim4dev@gmail.com> 5.0.1-1
+   - Version 5.0.1
+
+   * Thu Feb 20 2010 Yuri Timofeev <tim4dev@gmail.com> 5.0-1
+   - Version 5.0
+
+   * Tue Feb 16 2010 Yuri Timofeev <tim4dev@gmail.com> 3.5-1
+   - Version 3.5
+
+   * Wed Dec 9 2009 Yuri Timofeev <tim4dev@gmail.com> 3.4.1-1
+   - Version 3.4.1
+
+   * Fri Oct 16 2009 Yuri Timofeev <tim4dev@gmail.com> 3.4-1
+   - Version 3.4
+
+   * Tue Oct 13 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-6
+   - Fix #526855.
+
+   * Tue Oct 13 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-5
+   - Fix #526855. Remove Zend Framework from source.
+
+   * Tue Oct 13 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-4
+   - Fix #526855
+
+   * Mon Oct 12 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-3
+   - Fix #526855
+
+   * Sat Oct 10 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-2
+   - Fix #526855 "Review Request"
+
+   * Thu Oct 08 2009 Yuri Timofeev <tim4dev@gmail.com> 3.3-1
+   - Initial Spec file creation for Fedora
+
+ -- Yuri Timofeev <tim4dev@gmail.com>  Tue, 10 Aug 2010 12:00:00 +0000
+
