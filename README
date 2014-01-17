@@ -31,8 +31,7 @@ Webacula basic features:
   * The detailed information on Pools, Volumes, Storages and Clients
   * Logbook. Logbook - is simple electronic journal of backups. 
     Records in logbook are insert, modify, delete manually by the operator. 
-    Records can contain links (usual web-links on which it is possible to click) to Bacula Jobs or 
-    links to other records of this logbook. 
+    Records can contain links (usual web-links on which it is possible to click) to Bacula Jobs or links to other records of this logbook. 
     In logbook insert records, for example, about Jobs, failures of the equipment, supernumerary situations, etc. 
     Logbook stored in a separate database "webacula", now it is supported MySQL, PostgreSQL and Sqlite.
   * RSS feed
