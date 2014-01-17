@@ -37,8 +37,14 @@ Webacula basic features:
   * RSS feed
   * Multilingual support - standard gettext (*.mo) files. Currently supported languages: English, Czech, French, German, Italian, Portuguese Brazil, Russian, Spanish.
   * For web designers : now very easy to create new skins
-
-
+  
+Packages for the major Linux distributions are available at
+  * http://download.bareos.org/bareos/contrib/
+  
+Installing the webacula package on a system with a standard Bareos Director should result into a automatically configured webacula installation,
+accessable at
+  * http://localhost/webacula
+Default account is root, password: CHANGEME
 
 -------
 
