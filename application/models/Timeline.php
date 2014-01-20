@@ -81,7 +81,7 @@ class Timeline
 			));
 		    break;
 		case 'PDO_MYSQL':
-		    $select->from('job', array(
+		    $select->from('Job', array(
 			'JobId', 'Name', 'StartTime', 'EndTime',
 			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
 			));
@@ -138,7 +138,7 @@ class Timeline
 			));
 		    break;
 		case 'PDO_MYSQL':
-		    $select->from('job', array(
+		    $select->from('Job', array(
 			'JobId', 'Name', 'StartTime', 'EndTime',
 			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
 			));
@@ -193,7 +193,7 @@ class Timeline
 			));
 		    break;
 		case 'PDO_MYSQL':
-		    $select->from('job', array(
+		    $select->from('Job', array(
 			'JobId', 'Name', 'StartTime', 'EndTime',
 			'SchedTime','RealEndTime','JobStatus','JobBytes','JobBytes'
 			));
