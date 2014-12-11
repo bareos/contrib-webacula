@@ -94,7 +94,7 @@ make DESTDIR=%{buildroot} install
 
 
 %post
-# if command a2enmod exists, 
+# if command a2enmod exists,
 # use it to enable Apache rewrite module
 LOG=/var/log/webacula-install.log
 echo "`date`: BEGIN webacula-config init" >> $LOG

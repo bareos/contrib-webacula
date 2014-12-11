@@ -15,10 +15,15 @@ if ! [ -x "$BAREOS_CONFIG" ]; then
     echo "FAILED: $BAREOS_CONFIG not found"
     exit 1
 fi
-ARGS="$@"
-shift $#
-source /usr/lib/bareos/scripts/bareos-config
-set -- $ARGS
+
+if -r /usr/lib/bareos/scripts/bareos-config-lib.sh; then
+  source /usr/lib/bareos/scripts/bareos-config-lib.sh
+else
+  ARGS="$@"
+  shift $#
+  source /usr/lib/bareos/scripts/bareos-config
+  set -- $ARGS
+fi
 
 get_config_value()
 {
