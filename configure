@@ -2283,7 +2283,7 @@ if test x$HTTPD_CONF = xno; then
                 HTTPD_CONF="/etc/apache2/conf.d"
         elif test -d /etc/apache/conf.d; then
                 HTTPD_CONF="/etc/apache/conf.d"
-	elif test -d /etc/apache/conf-available; then
+	elif test -d /etc/apache2/conf-available; then
 		HTTPD_CONF="/etc/apache2/conf-available"
         else
                 HTTPD_CONF="/etc/httpd/conf.d"
