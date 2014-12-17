@@ -41,10 +41,13 @@ Webacula basic features:
 Packages for the major Linux distributions are available at
   * http://download.bareos.org/bareos/contrib/
 
-Installation
+
+INSTALLATION
 
 Installing the webacula package on a system with a standard Bareos Director should result into a automatically configured webacula installation,
-accessable at http://localhost/webacula. Default account is root, password: CHANGEME
+accessable at http://localhost/webacula.
+
+Default account is root, password: CHANGEME
 
 If you install on Ubuntu 13.x or Debian Jessie, you will first need to enable the webacula apache2 configuration:
 
@@ -53,6 +56,20 @@ a2enconf webacula
 To activate the new configuration, you need to run:
 
 service apache2 reload
+
+Additional installation notes Ubuntu 14.x:
+
+To get webacula running, please create a symlink to Zend Framework.
+
+cd /usr/share/php
+
+ln -s libzend-framework-php/Zend Zend
+
+service apache2 restart
+
+Additional installation notes:
+
+It is possible you have to edit /etc/webacula/config.ini and set the catalog.version entry to the corresponding you have in use e.g. 2001 or 2003.
 
 -------
 

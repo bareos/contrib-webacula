@@ -16,10 +16,10 @@ if ! [ -x "$BAREOS_CONFIG" ]; then
     exit 1
 fi
 
-if -r /usr/lib/bareos/scripts/bareos-config-lib.sh; then
+if test -r /usr/lib/bareos/scripts/bareos-config-lib.sh; then
   source /usr/lib/bareos/scripts/bareos-config-lib.sh
 else
-  ARGS="$@"
+  ARGS="q$@"
   shift $#
   source /usr/lib/bareos/scripts/bareos-config
   set -- $ARGS
