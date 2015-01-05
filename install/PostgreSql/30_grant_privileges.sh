@@ -18,8 +18,10 @@ fi
 
 if [ "$ARG1" = "readonly" ]; then
     PERMISSION="SELECT"
+    PERMISSION_SEQ="SELECT"
 else
     PERMISSION="ALL"
+    PERMISSION_SEQ="SELECT, UPDATE"
 fi
 
 TABLE_PERMISSIONS="
@@ -43,28 +45,25 @@ GRANT ${PERMISSION} ON webacula_where_acl TO ${db_user};
 GRANT ${PERMISSION} ON webacula_php_session TO ${db_user};
 "
 
-SEQUENCE_PERMISSIONS=""
-if [ "$ARG1" != "readonly" ]; then
 SEQUENCE_PERMISSIONS="
 -- For sequences ON those tables
-GRANT SELECT, UPDATE ON webacula_client_acl_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_command_acl_id_seq  TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_dt_commands_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_dt_resources_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_fileset_acl_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_job_acl_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_jobdesc_desc_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_logbook_logid_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_logtype_typeid_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_pool_acl_id_seq  TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_resources_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_roles_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_storage_acl_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_tmp_tablelist_tmpid_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_users_id_seq TO ${db_user};
-GRANT SELECT, UPDATE ON webacula_where_acl_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_client_acl_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_command_acl_id_seq  TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_dt_commands_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_dt_resources_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_fileset_acl_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_job_acl_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_jobdesc_desc_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_logbook_logid_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_logtype_typeid_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_pool_acl_id_seq  TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_resources_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_roles_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_storage_acl_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_tmp_tablelist_tmpid_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_users_id_seq TO ${db_user};
+GRANT ${PERMISSION_SEQ} ON webacula_where_acl_id_seq TO ${db_user};
 "
-fi
 
 printf "CMD: $CMD\n"
 eval $CMD <<END-OF-DATA
