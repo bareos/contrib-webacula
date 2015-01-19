@@ -160,7 +160,7 @@ configure_postgres()
             if type -p pg_ctl > /dev/null 2>&1; then
                 su - postgres -c "pg_ctl reload" || ((error+=1))
             elif [ -r /etc/init.d/postgresql ]; then
-                /etc/init.d/postgresql || ((error+=1))
+                /etc/init.d/postgresql restart || ((error+=1))
             else
                 echo "WARN: please reload PostgreSql database"
             fi
