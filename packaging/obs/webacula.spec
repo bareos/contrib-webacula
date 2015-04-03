@@ -17,8 +17,6 @@ BuildRequires: sudo
 
 Requires: bareos-bconsole bareos-common
 Requires: php >= 5.2.4
-Requires: php-ZendFramework >= 1.8.3
-Requires: php-ZendFramework-captcha
 Requires: php-pdo
 Requires: php-json
 Requires: php-pcre
@@ -37,6 +35,8 @@ BuildRequires: apache2-devel
 Requires:   apache
 Requires:   cron
 Requires:   mod_php_any
+Requires:   php5-ZendFramework >= 1.8.3
+Requires:   php5-ZendFramework-captcha
 Recommends: php-pgsql php-mysql php-sqlite
 Suggests:   postgresql-server mysql sqlite3
 %else
@@ -51,6 +51,8 @@ Requires:   cronie
 Requires:   httpd
 Requires:   mod_php
 Requires:   php-pgsql php-mysql
+Requires:   php-ZendFramework >= 1.8.3
+Requires:   php-ZendFramework-Captcha
 # not available?
 #php-sqlite
 %endif
